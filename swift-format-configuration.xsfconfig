@@ -1,0 +1,19 @@
+{
+  "prioritizeKeepingFunctionOutputTogether" : true,
+  "tabWidth" : 8,
+  "metadata" : {
+    "version" : "1.0.1",
+    "type" : "configuration",
+    "build" : "200501"
+  },
+  "lineLength" : 100,
+  "lineBreakBeforeEachArgument" : true,
+  "maximumBlankLines" : 1,
+  "indentConditionalCompilationBlocks" : true,
+  "lineBreakBeforeEachGenericRequirement" : true,
+  "respectsExistingLineBreaks" : true,
+  "indentation" : {
+    "spaces" : 2
+  },
+  "lineBreakBeforeControlFlowKeywords" : true
+}
