@@ -1,0 +1,9 @@
+files:
+- path: ./CHANGELOG.md
+  categories:
+  - Added
+  - Changed
+  - Deprecated
+  - Removed
+  - Fixed
+  - Security
