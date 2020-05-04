@@ -5,7 +5,7 @@ struct ChangelogManager: ParsableCommand {
     commandName: nil,
     abstract: "A utility and framework for managing and generating changelogs",
     version: "0.0.1",
-    subcommands: []
+    subcommands: [Init.self]
   )
 }
 
