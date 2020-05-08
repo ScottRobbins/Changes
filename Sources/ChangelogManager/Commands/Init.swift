@@ -28,7 +28,9 @@ struct Init: ParsableCommand {
     let fileString = try encoder.encode(config)
     try Folder.current.createFile(named: Self.configFileName).append(fileString)
 
-    let changelogsFolder = try Folder.current.createSubfolderIfNeeded(withName: ".changelog-manager")
+    let changelogsFolder = try Folder.current.createSubfolderIfNeeded(
+      withName: ".changelog-manager"
+    )
     try changelogsFolder.createSubfolderIfNeeded(withName: "Unreleased")
     try changelogsFolder.createSubfolderIfNeeded(withName: "releases")
     let readmeFile = try changelogsFolder.createFileIfNeeded(at: "README.md")
@@ -46,10 +48,6 @@ struct Init: ParsableCommand {
     based on these.
 
     _Note: Because of this, you do need to check in these files._
-
-    ### Basic Usage
-    
-    TODO: Add commands
     """
   }
 }

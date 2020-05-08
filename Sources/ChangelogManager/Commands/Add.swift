@@ -1,6 +1,7 @@
 import ArgumentParser
 import Files
 import Foundation
+import Version
 import Yams
 
 struct Add: ParsableCommand {
@@ -28,7 +29,7 @@ struct Add: ParsableCommand {
       #"Specify a release you would like to add this changelog entry to. By default it will be added to the "Unreleased" section."#
     )
   )
-  var release: String?
+  var release: Version?
 
   func validate() throws {
     guard
@@ -73,13 +74,19 @@ struct Add: ParsableCommand {
 
     let outputFolder: Folder
     if let release = release {
-      outputFolder = try Folder.current.subfolder(at: ".changelog-manager/releases/\(release)")
+      outputFolder = try Folder.current.createSubfolderIfNeeded(
+        at: ".changelog-manager/releases/\(release)/entries"
+      )
     }
     else {
       outputFolder = try Folder.current.subfolder(named: ".changelog-manager/Unreleased")
     }
 
-    let entry = ChangelogEntry(category: category, description: description)
+    let entry = ChangelogEntry(
+      category: category,
+      description: description,
+      createdAtDate: Date()
+    )
     let encoder = YAMLEncoder()
     let outputString = try encoder.encode(entry)
 
@@ -141,5 +148,18 @@ struct Add: ParsableCommand {
 
   private func allCategories(with config: ChangelogManagerConfig) -> [String] {
     Array(config.files.map(\.categories).joined())
+  }
+}
+
+extension Version: ExpressibleByArgument {
+  public init?(
+    argument: String
+  ) {
+    if let version = try? Version(argument) {
+      self = version
+    }
+    else {
+      return nil
+    }
   }
 }
