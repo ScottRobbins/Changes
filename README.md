@@ -22,32 +22,32 @@ Add this to your package.swift file.
 ```
 
 Initialize your repository with a configuration file.
-```swift
-swift run changelog-manager init
+```bash
+$ swift run changelog-manager init
 ```
 
 That will create a configuration file called `.changelog-manager.yml`. 
 
 Add a changelog entry by following the CLI prompts.
-```swift
-swift run changelog-manager add
+```bash
+vswift run changelog-manager add
 ```
 
 It will then ask you for the category this entry should be under as well as a description of your Changelog entry.
 
 You can also provide this information as arguments.
-```swift
-swift run changelog-manager add --category Added --description "Added my first Changelog entry!"
+```bash
+$ swift run changelog-manager add --category Added --description "Added my first Changelog entry!"
 ```
 
 If you need to add an entry to an existing release*, you can speicfy that as an argument.
-```swift
-swift run changelog-manager add --release 1.0.0
+```bash
+$ swift run changelog-manager add --release 1.0.0
 ```
 
 *Creating new releases has not yet been built
 
 If at any point in time you would like to regenerate your Changelog:
-```swift
-swift run changelog-manager regenerate
+```bash
+$ swift run changelog-manager regenerate
 ```
