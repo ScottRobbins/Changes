@@ -91,6 +91,7 @@ struct Add: ParsableCommand {
     let outputString = try encoder.encode(entry)
 
     try outputFolder.createFile(named: "\(UUID().uuidString).yml").write(outputString)
+    try ChangelogGenerator().regenerateChangelogs()
   }
 
   private func getCategory(with config: ChangelogManagerConfig) -> String {
