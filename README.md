@@ -30,7 +30,7 @@ That will create a configuration file called `.changelog-manager.yml`.
 
 Add a changelog entry by following the CLI prompts.
 ```bash
-vswift run changelog-manager add
+$ swift run changelog-manager add
 ```
 
 It will then ask you for the category this entry should be under as well as a description of your Changelog entry.
