@@ -4,7 +4,7 @@ import Version
 struct RegenerateChangelog: ParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "regenerate",
-    abstract: "Regenerates all changelog files"
+    abstract: "Regenerate all changelog files."
   )
 
   func run() throws {

@@ -7,7 +7,7 @@ import Yams
 struct Add: ParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "add",
-    abstract: "Add a new changelog entry"
+    abstract: "Add a new changelog entry."
   )
 
   @Option(
