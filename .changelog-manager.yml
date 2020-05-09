@@ -1,6 +1,6 @@
 files:
 - path: ./CHANGELOG.md
-  categories:
+  tags:
   - Added
   - Changed
   - Deprecated

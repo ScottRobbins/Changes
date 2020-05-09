@@ -20,7 +20,7 @@ struct Init: ParsableCommand {
     let config = ChangelogManagerConfig(files: [
       .init(
         path: "./CHANGELOG.md",
-        categories: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+        tags: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
       )
     ])
 
