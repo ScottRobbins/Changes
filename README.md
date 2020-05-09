@@ -39,11 +39,13 @@ You can also provide this information as arguments.
 ```bash
 $ swift run changelog add --tag Added --description "Added my first Changelog entry!"
 ```
+(You can also use the shortened arguments of `-t` and `-d`)
 
 If you need to add an entry to an existing release*, you can speicfy that as an argument.
 ```bash
 $ swift run changelog add --release 1.0.0
 ```
+(You can also use the shortened argument of `-r`)
 
 *Creating new releases has not yet been built
 

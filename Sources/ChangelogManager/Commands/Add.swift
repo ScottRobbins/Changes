@@ -11,6 +11,7 @@ struct Add: ParsableCommand {
   )
 
   @Option(
+    name: .shortAndLong,
     help: .init(
       "Specify a tag for your changelog entry."
     )
@@ -18,6 +19,7 @@ struct Add: ParsableCommand {
   var tag: String?
 
   @Option(
+    name: .shortAndLong,
     help: .init(
       "Specify a description for your changelog entry."
     )
@@ -25,6 +27,7 @@ struct Add: ParsableCommand {
   var description: String?
 
   @Option(
+    name: .shortAndLong,
     help: .init(
       #"Specify a release you would like to add this changelog entry to. By default it will be added to the "Unreleased" section."#
     )
