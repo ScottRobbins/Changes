@@ -7,17 +7,19 @@ import Yams
 struct Add: ParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "add",
-    abstract: "Add a new changelog entry"
+    abstract: "Add a new changelog entry."
   )
 
   @Option(
+    name: .shortAndLong,
     help: .init(
-      "Specify a category for your changelog entry."
+      "Specify a tag for your changelog entry."
     )
   )
-  var category: String?
+  var tag: String?
 
   @Option(
+    name: .shortAndLong,
     help: .init(
       "Specify a description for your changelog entry."
     )
@@ -25,6 +27,7 @@ struct Add: ParsableCommand {
   var description: String?
 
   @Option(
+    name: .shortAndLong,
     help: .init(
       #"Specify a release you would like to add this changelog entry to. By default it will be added to the "Unreleased" section."#
     )
@@ -43,9 +46,9 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    if let category = category {
-      guard Set(allCategories(with: config)).contains(category) else {
-        throw ValidationError("Category specified is not used for any files in config.")
+    if let tag = tag {
+      guard Set(allTags(with: config)).contains(tag) else {
+        throw ValidationError("Tag specified is not used for any files in config.")
       }
     }
 
@@ -69,7 +72,7 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    let category = self.category ?? getCategory(with: config)
+    let tag = self.tag ?? getTag(with: config)
     let description = self.description ?? getDescription()
 
     let outputFolder: Folder
@@ -83,7 +86,7 @@ struct Add: ParsableCommand {
     }
 
     let entry = ChangelogEntry(
-      category: category,
+      tag: tag,
       description: description,
       createdAtDate: Date()
     )
@@ -94,40 +97,40 @@ struct Add: ParsableCommand {
     try ChangelogGenerator().regenerateChangelogs()
   }
 
-  private func getCategory(with config: ChangelogManagerConfig) -> String {
-    let _allCategories = allCategories(with: config)
-    let categoryString = _allCategories.enumerated().map { (category) -> String in
-      "[\(category.offset)]  \(category.element)"
+  private func getTag(with config: ChangelogManagerConfig) -> String {
+    let _allTags = allTags(with: config)
+    let tagString = _allTags.enumerated().map { (tag) -> String in
+      "[\(tag.offset)]  \(tag.element)"
     }.joined(separator: "\n")
     print(
       """
-      Select a category from:
+      Select a tag from:
 
-      \(categoryString)
+      \(tagString)
 
       """
     )
 
     while true {
-      print("Enter the category:", terminator: " ")
-      let readCategory = (readLine() ?? "").trimmingCharacters(in: .whitespaces)
+      print("Enter the tag:", terminator: " ")
+      let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespaces)
 
-      if let number = Int(argument: readCategory) {
-        if let category = _allCategories.element(atIndex: number) {
-          return category
+      if let number = Int(argument: readTag) {
+        if let tag = _allTags.element(atIndex: number) {
+          return tag
         }
         else {
           print("\(number) is not a valid entry.")
         }
       }
-      else if readCategory.isEmpty {
-        print("Please enter a category.")
+      else if readTag.isEmpty {
+        print("Please enter a tag.")
       }
-      else if Set(_allCategories).contains(readCategory) {
-        return readCategory
+      else if Set(_allTags).contains(readTag) {
+        return readTag
       }
       else {
-        print("\(readCategory) is not a valid category")
+        print("\(readTag) is not a valid tag")
       }
     }
   }
@@ -147,8 +150,8 @@ struct Add: ParsableCommand {
     }
   }
 
-  private func allCategories(with config: ChangelogManagerConfig) -> [String] {
-    Array(config.files.map(\.categories).joined())
+  private func allTags(with config: ChangelogManagerConfig) -> [String] {
+    Array(config.files.map(\.tags).joined())
   }
 }
 

@@ -1,16 +1,16 @@
 import Foundation
 
 struct ChangelogEntry: Codable {
-  let category: String
+  let tag: String
   let description: String
   let createdAtDate: Date
 
   init(
-    category: String,
+    tag: String,
     description: String,
     createdAtDate: Date
   ) {
-    self.category = category
+    self.tag = tag
     self.description = description
     self.createdAtDate = createdAtDate
   }
@@ -19,7 +19,7 @@ struct ChangelogEntry: Codable {
     from decoder: Decoder
   ) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
-    category = try values.decode(String.self, forKey: .category)
+    tag = try values.decode(String.self, forKey: .tag)
     description = try values.decode(String.self, forKey: .description)
     let _createdAtDate = try values.decode(String.self, forKey: .createdAtDate)
 
@@ -37,7 +37,7 @@ struct ChangelogEntry: Codable {
 
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(category, forKey: .category)
+    try container.encode(tag, forKey: .tag)
     try container.encode(description, forKey: .description)
 
     let dateString = ISO8601DateFormatter().string(from: createdAtDate)
@@ -45,7 +45,7 @@ struct ChangelogEntry: Codable {
   }
 
   enum CodingKeys: String, CodingKey {
-    case category
+    case tag
     case description
     case createdAtDate
   }
