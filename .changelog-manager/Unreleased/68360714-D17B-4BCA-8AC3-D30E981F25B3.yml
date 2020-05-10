@@ -1,5 +1,4 @@
-tag: Added
-description: 'Ability to generate/regenerate the changelog file(s)
-
-  '
+tags: 
+- Added
+description: 'Ability to generate/regenerate the changelog file(s)'
 createdAtDate: '2020-05-08T06:53:29Z'

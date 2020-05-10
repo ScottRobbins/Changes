@@ -86,7 +86,7 @@ struct Add: ParsableCommand {
     }
 
     let entry = ChangelogEntry(
-      tag: tag,
+      tags: [tag],
       description: description,
       createdAtDate: Date()
     )
@@ -113,7 +113,7 @@ struct Add: ParsableCommand {
 
     while true {
       print("Enter the tag:", terminator: " ")
-      let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespaces)
+      let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 
       if let number = Int(argument: readTag) {
         if let tag = _allTags.element(atIndex: number) {
@@ -139,7 +139,7 @@ struct Add: ParsableCommand {
     while true {
       print("Enter a description for this change:", terminator: " ")
       let description = (readLine() ?? "").trimmingCharacters(
-        in: .whitespaces
+        in: .whitespacesAndNewlines
       )
       if description.isEmpty {
         print("Please enter a description.")
