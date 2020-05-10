@@ -21,7 +21,9 @@ let package = Package(
     .target(
       name: "ChangelogManager",
       dependencies: [
-        "Files", .product(name: "ArgumentParser", package: "swift-argument-parser"), "Version",
+        "Files",
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        "Version",
         "Yams",
       ]
     ),
