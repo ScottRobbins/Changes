@@ -12,11 +12,12 @@ struct Add: ParsableCommand {
 
   @Option(
     name: .shortAndLong,
+    parsing: .upToNextOption,
     help: .init(
-      "Specify a tag for your changelog entry."
+      "Specify one or more tags for your changelog entry."
     )
   )
-  var tag: String?
+  var tags: [String]
 
   @Option(
     name: .shortAndLong,
@@ -46,9 +47,10 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    if let tag = tag {
-      guard Set(allTags(with: config)).contains(tag) else {
-        throw ValidationError("Tag specified is not used for any files in config.")
+    let _allTags = Set(allTags(with: config))
+    for tag in tags {
+      guard _allTags.contains(tag) else {
+        throw ValidationError("Tag \(tag) specified is not defined in config.")
       }
     }
 
@@ -72,7 +74,7 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    let tag = self.tag ?? getTag(with: config)
+    let tags = self.tags.isEmpty ? getTags(with: config) : self.tags
     let description = self.description ?? getDescription()
 
     let outputFolder: Folder
@@ -86,7 +88,7 @@ struct Add: ParsableCommand {
     }
 
     let entry = ChangelogEntry(
-      tags: [tag],
+      tags: tags,
       description: description,
       createdAtDate: Date()
     )
@@ -97,27 +99,38 @@ struct Add: ParsableCommand {
     try ChangelogGenerator().regenerateChangelogs()
   }
 
-  private func getTag(with config: ChangelogManagerConfig) -> String {
+  private func getTags(with config: ChangelogManagerConfig) -> [String] {
     let _allTags = allTags(with: config)
-    let tagString = _allTags.enumerated().map { (tag) -> String in
-      "[\(tag.offset)]  \(tag.element)"
-    }.joined(separator: "\n")
+    let tagString =
+      _allTags.enumerated().map { (tag) -> String in
+        "[\(tag.offset)]  \(tag.element)"
+      }.joined(separator: "\n")
     print(
       """
-      Select a tag from:
+      Select one or more tags from:
 
       \(tagString)
 
       """
     )
 
+    var enteredTags = [String]()
     while true {
-      print("Enter the tag:", terminator: " ")
+      if enteredTags.isEmpty {
+        print("Enter a tag:", terminator: " ")
+      }
+      else {
+        print("Enter anoter tag, or press enter if done:", terminator: " ")
+      }
+
       let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 
-      if let number = Int(argument: readTag) {
+      if readTag.isEmpty && !enteredTags.isEmpty {
+        return enteredTags
+      }
+      else if let number = Int(argument: readTag) {
         if let tag = _allTags.element(atIndex: number) {
-          return tag
+          enteredTags.append(tag)
         }
         else {
           print("\(number) is not a valid entry.")
@@ -127,7 +140,7 @@ struct Add: ParsableCommand {
         print("Please enter a tag.")
       }
       else if Set(_allTags).contains(readTag) {
-        return readTag
+        enteredTags.append(readTag)
       }
       else {
         print("\(readTag) is not a valid tag")
