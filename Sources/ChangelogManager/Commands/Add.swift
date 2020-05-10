@@ -47,9 +47,8 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    let _allTags = Set(allTags(with: config))
     for tag in tags {
-      guard _allTags.contains(tag) else {
+      guard definedTag(matching: tag, with: config) != nil else {
         throw ValidationError("Tag \(tag) specified is not defined in config.")
       }
     }
@@ -74,7 +73,14 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    let tags = self.tags.isEmpty ? getTags(with: config) : self.tags
+    let tags: [String]
+    if self.tags.isEmpty {
+      tags = getTags(with: config)
+    }
+    else {
+      tags = self.tags.compactMap { definedTag(matching: $0, with: config) }
+    }
+
     let description = self.description ?? getDescription()
 
     let outputFolder: Folder
@@ -139,8 +145,8 @@ struct Add: ParsableCommand {
       else if readTag.isEmpty {
         print("Please enter a tag.")
       }
-      else if Set(_allTags).contains(readTag) {
-        enteredTags.append(readTag)
+      else if let tag = definedTag(matching: readTag, with: config) {
+        enteredTags.append(tag)
       }
       else {
         print("\(readTag) is not a valid tag")
@@ -165,6 +171,10 @@ struct Add: ParsableCommand {
 
   private func allTags(with config: ChangelogManagerConfig) -> [String] {
     Array(config.files.map(\.tags).joined())
+  }
+
+  private func definedTag(matching tag: String, with config: ChangelogManagerConfig) -> String? {
+    return allTags(with: config).first { $0.lowercased() == tag.lowercased() }
   }
 }
 
