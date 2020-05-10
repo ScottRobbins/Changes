@@ -12,11 +12,12 @@ struct Add: ParsableCommand {
 
   @Option(
     name: .shortAndLong,
+    parsing: .upToNextOption,
     help: .init(
-      "Specify a tag for your changelog entry."
+      "Specify one or more tags for your changelog entry."
     )
   )
-  var tag: String?
+  var tags: [String]
 
   @Option(
     name: .shortAndLong,
@@ -46,9 +47,9 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    if let tag = tag {
-      guard Set(allTags(with: config)).contains(tag) else {
-        throw ValidationError("Tag specified is not used for any files in config.")
+    for tag in tags {
+      guard definedTag(matching: tag, with: config) != nil else {
+        throw ValidationError("Tag \(tag) specified is not defined in config.")
       }
     }
 
@@ -72,7 +73,14 @@ struct Add: ParsableCommand {
       throw ValidationError("Invalid config file format.")
     }
 
-    let tag = self.tag ?? getTag(with: config)
+    let tags: [String]
+    if self.tags.isEmpty {
+      tags = getTags(with: config)
+    }
+    else {
+      tags = self.tags.compactMap { definedTag(matching: $0, with: config) }
+    }
+
     let description = self.description ?? getDescription()
 
     let outputFolder: Folder
@@ -86,7 +94,7 @@ struct Add: ParsableCommand {
     }
 
     let entry = ChangelogEntry(
-      tag: tag,
+      tags: tags,
       description: description,
       createdAtDate: Date()
     )
@@ -97,27 +105,38 @@ struct Add: ParsableCommand {
     try ChangelogGenerator().regenerateChangelogs()
   }
 
-  private func getTag(with config: ChangelogManagerConfig) -> String {
+  private func getTags(with config: ChangelogManagerConfig) -> [String] {
     let _allTags = allTags(with: config)
-    let tagString = _allTags.enumerated().map { (tag) -> String in
-      "[\(tag.offset)]  \(tag.element)"
-    }.joined(separator: "\n")
+    let tagString =
+      _allTags.enumerated().map { (tag) -> String in
+        "[\(tag.offset)]  \(tag.element)"
+      }.joined(separator: "\n")
     print(
       """
-      Select a tag from:
+      Select one or more tags from:
 
       \(tagString)
 
       """
     )
 
+    var enteredTags = [String]()
     while true {
-      print("Enter the tag:", terminator: " ")
-      let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespaces)
+      if enteredTags.isEmpty {
+        print("Enter a tag:", terminator: " ")
+      }
+      else {
+        print("Enter anoter tag, or press enter if done:", terminator: " ")
+      }
 
-      if let number = Int(argument: readTag) {
+      let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+
+      if readTag.isEmpty && !enteredTags.isEmpty {
+        return enteredTags
+      }
+      else if let number = Int(argument: readTag) {
         if let tag = _allTags.element(atIndex: number) {
-          return tag
+          enteredTags.append(tag)
         }
         else {
           print("\(number) is not a valid entry.")
@@ -126,8 +145,8 @@ struct Add: ParsableCommand {
       else if readTag.isEmpty {
         print("Please enter a tag.")
       }
-      else if Set(_allTags).contains(readTag) {
-        return readTag
+      else if let tag = definedTag(matching: readTag, with: config) {
+        enteredTags.append(tag)
       }
       else {
         print("\(readTag) is not a valid tag")
@@ -139,7 +158,7 @@ struct Add: ParsableCommand {
     while true {
       print("Enter a description for this change:", terminator: " ")
       let description = (readLine() ?? "").trimmingCharacters(
-        in: .whitespaces
+        in: .whitespacesAndNewlines
       )
       if description.isEmpty {
         print("Please enter a description.")
@@ -152,6 +171,10 @@ struct Add: ParsableCommand {
 
   private func allTags(with config: ChangelogManagerConfig) -> [String] {
     Array(config.files.map(\.tags).joined())
+  }
+
+  private func definedTag(matching tag: String, with config: ChangelogManagerConfig) -> String? {
+    return allTags(with: config).first { $0.lowercased() == tag.lowercased() }
   }
 }
 

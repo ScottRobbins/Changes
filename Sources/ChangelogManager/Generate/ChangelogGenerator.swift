@@ -132,8 +132,8 @@ struct ChangelogGenerator {
     entries: [ChangelogEntry],
     file: ChangelogManagerConfig.ChangelogFile
   ) -> String {
-    let validEntries = entries.filter { file.tags.contains($0.tag) }
-    let usedTags = validEntries.map(\.tag).uniqueValues().sorted {
+    let validEntries = entries.filter { !Set(file.tags).intersection($0.tags).isEmpty }
+    let usedTags = validEntries.flatMap(\.tags).uniqueValues().sorted {
       if let index1 = file.tags.firstIndex(of: $0),
         let index2 = file.tags.firstIndex(of: $1)
       {
@@ -147,7 +147,7 @@ struct ChangelogGenerator {
     let tagsString: String = usedTags.map { usedTag in
       let entriesString =
         validEntries
-        .filter { $0.tag == usedTag }
+        .filter { $0.tags.contains(usedTag) }
         .sorted {
           $0.createdAtDate < $1.createdAtDate
         }.map {

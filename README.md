@@ -11,7 +11,9 @@ of your entry, when it was added and what to tag the entry as. It will then use 
 generate / regenerate your changelog.
 
 Tags might include things you would want in a Changelog (Added, Removed, Fixed, etc), but you may have 
-other tags for separate files (perhaps a "Release Note" tag, or a tag to generate notes for QA). 
+other tags for separate files (perhaps a "Release Note" tag, a tag to generate notes for QA, or a tag that denotes 
+whether this change will require a major/minor/patch version bump). 
+
 You can define multiple files that all get generated with whatever tags they should understand.
 
 ### Getting Started
@@ -33,11 +35,11 @@ Add a changelog entry by following the CLI prompts.
 $ swift run changelog add
 ```
 
-It will then ask you for the tag this entry should be under as well as a description of your Changelog entry.
+It will then ask you this entry should be tagged with as well as a description of your Changelog entry.
 
 You can also provide this information as arguments.
 ```bash
-$ swift run changelog add --tag Added --description "Added my first Changelog entry!"
+$ swift run changelog add --tags Added Minor --description "Added some new Ability!"
 ```
 (You can also use the shortened arguments of `-t` and `-d`)
 
