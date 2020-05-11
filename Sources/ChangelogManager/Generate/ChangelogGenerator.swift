@@ -52,10 +52,22 @@ struct ChangelogGenerator {
       DispatchQueue.global(qos: .userInitiated).async(group: group) {
         do {
           let version = try Version(releaseFolder.name)
-          let entries = try self.changelogEntries(
-            folder: releaseFolder.createSubfolderIfNeeded(at: "entries"),
-            decoder: decoder
-          )
+          let preReleaseFolders = try releaseFolder
+            .subfolders
+            .filter { $0.name != "entries" }
+            .sorted {
+              try Version($0.name) < Version($1.name)
+            }
+
+          let entryFolders = preReleaseFolders + [releaseFolder]
+          let entries = try entryFolders.flatMap {
+            try self.changelogEntries(
+              folder: $0.createSubfolderIfNeeded(at: "entries"),
+              decoder: decoder
+            ).sorted {
+              $0.createdAtDate < $1.createdAtDate
+            }
+          }
 
           queue.sync(flags: .barrier) {
             releaseEntries.append(.init(version: version, entries: entries))
@@ -82,7 +94,9 @@ struct ChangelogGenerator {
     let unreleasedFolder = try Folder.current.createSubfolderIfNeeded(
       at: ".changelog-manager/Unreleased"
     )
-    return try changelogEntries(folder: unreleasedFolder, decoder: decoder)
+    return try changelogEntries(folder: unreleasedFolder, decoder: decoder).sorted {
+      $0.createdAtDate < $1.createdAtDate
+    }
   }
 
   private func changelogEntries(folder: Folder, decoder: YAMLDecoder) throws -> [ChangelogEntry] {
@@ -148,9 +162,7 @@ struct ChangelogGenerator {
       let entriesString =
         validEntries
         .filter { $0.tags.contains(usedTag) }
-        .sorted {
-          $0.createdAtDate < $1.createdAtDate
-        }.map {
+        .map {
           "- \($0.description)"
         }.joined(separator: "\n")
 
