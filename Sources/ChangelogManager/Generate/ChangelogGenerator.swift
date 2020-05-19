@@ -7,7 +7,15 @@ import Yams
 struct ChangelogGenerator {
   private struct ReleaseEntry {
     let version: Version
+    let createdAtDate: Date
     let entries: [ChangelogEntry]
+  }
+  
+  let dateFormatter = ISO8601DateFormatter()
+  let decoder = YAMLDecoder()
+  
+  init() {
+    dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
   }
 
   func regenerateChangelogs() throws {
@@ -17,14 +25,13 @@ struct ChangelogGenerator {
       throw ValidationError("No config found.")
     }
 
-    let decoder = YAMLDecoder()
     guard let config = try? decoder.decode(ChangelogManagerConfig.self, from: configString) else {
       throw ValidationError("Invalid config file format.")
     }
 
-    let releaseEntries = try getReleaseEntries(decoder: decoder)
+    let releaseEntries = try getReleaseEntries()
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
-    let unreleasedEntries = try getUnreleasedEntries(decoder: decoder)
+    let unreleasedEntries = try getUnreleasedEntries()
 
     for file in config.files {
       try writeToChangelog(
@@ -35,7 +42,7 @@ struct ChangelogGenerator {
     }
   }
 
-  private func getReleaseEntries(decoder: YAMLDecoder) throws -> [ReleaseEntry] {
+  private func getReleaseEntries() throws -> [ReleaseEntry] {
     var releaseEntries = [ReleaseEntry]()
     var error: Error?
     let queue = DispatchQueue(
@@ -51,11 +58,13 @@ struct ChangelogGenerator {
     for releaseFolder in releaseFolders {
       DispatchQueue.global(qos: .userInitiated).async(group: group) {
         do {
-          let releaseVersion = try self.getVersion(for: releaseFolder, decoder: decoder)
+          let releaseInfo = try self.getReleaseInfo(for: releaseFolder)
           let preReleaseFolders = try releaseFolder
             .subfolders
             .filter { $0.name != "entries" }
-            .map { (version: try self.getVersion(for: $0, decoder: decoder), folder: $0) }
+            .map {
+              (version: try self.getReleaseInfo(for: $0).version, folder: $0)
+            }
             .sorted {
               $0.version < $1.version
             }
@@ -64,15 +73,20 @@ struct ChangelogGenerator {
           let entryFolders = preReleaseFolders + [releaseFolder]
           let entries = try entryFolders.flatMap {
             try self.changelogEntries(
-              folder: $0.createSubfolderIfNeeded(at: "entries"),
-              decoder: decoder
+              folder: $0.createSubfolderIfNeeded(at: "entries")
             ).sorted {
               $0.createdAtDate < $1.createdAtDate
             }
           }
 
           queue.sync(flags: .barrier) {
-            releaseEntries.append(.init(version: releaseVersion, entries: entries))
+            releaseEntries.append(
+              .init(
+                version: releaseInfo.version,
+                createdAtDate: releaseInfo.createdAtDate,
+                entries: entries
+              )
+            )
           }
         }
         catch let e {
@@ -92,21 +106,21 @@ struct ChangelogGenerator {
     return releaseEntries
   }
 
-  private func getVersion(for folder: Folder, decoder: YAMLDecoder) throws -> Version {
+  private func getReleaseInfo(for folder: Folder) throws -> ReleaseInfo {
     let releaseInfoString = try folder.file(named: "info.yml").readAsString()
-    return try decoder.decode(ReleaseInfo.self, from: releaseInfoString).version
+    return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
   }
 
-  private func getUnreleasedEntries(decoder: YAMLDecoder) throws -> [ChangelogEntry] {
+  private func getUnreleasedEntries() throws -> [ChangelogEntry] {
     let unreleasedFolder = try Folder.current.createSubfolderIfNeeded(
       at: ".changelog-manager/Unreleased"
     )
-    return try changelogEntries(folder: unreleasedFolder, decoder: decoder).sorted {
+    return try changelogEntries(folder: unreleasedFolder).sorted {
       $0.createdAtDate < $1.createdAtDate
     }
   }
 
-  private func changelogEntries(folder: Folder, decoder: YAMLDecoder) throws -> [ChangelogEntry] {
+  private func changelogEntries(folder: Folder) throws -> [ChangelogEntry] {
     return try folder.files.map { file in
       let fileString = try file.readAsString()
       return try decoder.decode(ChangelogEntry.self, from: fileString)
@@ -125,8 +139,9 @@ struct ChangelogGenerator {
     )
 
     let releaseContentString = releaseEntries.map { releaseEntry in
-      sectionString(
+      return sectionString(
         name: releaseEntry.version.description,
+        date: releaseEntry.createdAtDate,
         entries: releaseEntry.entries,
         file: file
       )
@@ -150,13 +165,19 @@ struct ChangelogGenerator {
 
   private func sectionString(
     name: String,
+    date: Date? = nil,
     entries: [ChangelogEntry],
     file: ChangelogManagerConfig.ChangelogFile
   ) -> String {
+    let sectionNameString: String
+    if let date = date {
+      let dateString = dateFormatter.string(from:date)
+      sectionNameString = "## [\(name)] - \(dateString)"
+    } else {
+       sectionNameString = "## [\(name)]"
+    }
     if entries.isEmpty {
-      return """
-        ## [\(name)]
-        """
+      return sectionNameString
     }
 
     let validEntries = entries.filter { !Set(file.tags).intersection($0.tags).isEmpty }
@@ -186,7 +207,7 @@ struct ChangelogGenerator {
     }.joined(separator: "\n\n")
 
     return """
-      ## [\(name)]
+      \(sectionNameString)
       \(tagsString)
       """
   }
