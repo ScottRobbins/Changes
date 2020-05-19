@@ -51,13 +51,15 @@ struct ChangelogGenerator {
     for releaseFolder in releaseFolders {
       DispatchQueue.global(qos: .userInitiated).async(group: group) {
         do {
-          let version = try Version(releaseFolder.name)
+          let releaseVersion = try self.getVersion(for: releaseFolder, decoder: decoder)
           let preReleaseFolders = try releaseFolder
             .subfolders
             .filter { $0.name != "entries" }
+            .map { (version: try self.getVersion(for: $0, decoder: decoder), folder: $0) }
             .sorted {
-              try Version($0.name) < Version($1.name)
+              $0.version < $1.version
             }
+            .map(\.folder)
 
           let entryFolders = preReleaseFolders + [releaseFolder]
           let entries = try entryFolders.flatMap {
@@ -70,7 +72,7 @@ struct ChangelogGenerator {
           }
 
           queue.sync(flags: .barrier) {
-            releaseEntries.append(.init(version: version, entries: entries))
+            releaseEntries.append(.init(version: releaseVersion, entries: entries))
           }
         }
         catch let e {
@@ -88,6 +90,11 @@ struct ChangelogGenerator {
     }
 
     return releaseEntries
+  }
+
+  private func getVersion(for folder: Folder, decoder: YAMLDecoder) throws -> Version {
+    let releaseInfoString = try folder.file(named: "info.yml").readAsString()
+    return try decoder.decode(ReleaseInfo.self, from: releaseInfoString).version
   }
 
   private func getUnreleasedEntries(decoder: YAMLDecoder) throws -> [ChangelogEntry] {
