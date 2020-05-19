@@ -54,9 +54,23 @@ struct Add: ParsableCommand {
     }
 
     if let release = release {
-      guard let _ = try? Folder.current.subfolder(at: ".changelog-manager/releases/\(release)")
+      if release.isPrerelease {
+        guard
+          let _ = try? Folder.current.subfolder(
+            at: ".changelog-manager/releases/\(release.release)/\(release.droppingBuildMetadata)"
+          )
+        else {
+          throw ValidationError("Release \(release.droppingBuildMetadata) was not found.")
+        }
+      }
       else {
-        throw ValidationError("Release \(release) was not found.")
+        guard
+          let _ = try? Folder.current.subfolder(
+            at: ".changelog-manager/releases/\(release.release)"
+          )
+        else {
+          throw ValidationError("Release \(release.release) was not found.")
+        }
       }
     }
   }
@@ -85,9 +99,17 @@ struct Add: ParsableCommand {
 
     let outputFolder: Folder
     if let release = release {
-      outputFolder = try Folder.current.createSubfolderIfNeeded(
-        at: ".changelog-manager/releases/\(release)/entries"
-      )
+      if release.isPrerelease {
+        outputFolder = try Folder.current.createSubfolderIfNeeded(
+          at:
+            ".changelog-manager/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
+        )
+      }
+      else {
+        outputFolder = try Folder.current.createSubfolderIfNeeded(
+          at: ".changelog-manager/releases/\(release.release)/entries"
+        )
+      }
     }
     else {
       outputFolder = try Folder.current.subfolder(named: ".changelog-manager/Unreleased")
