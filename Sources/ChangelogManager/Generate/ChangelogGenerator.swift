@@ -153,6 +153,12 @@ struct ChangelogGenerator {
     entries: [ChangelogEntry],
     file: ChangelogManagerConfig.ChangelogFile
   ) -> String {
+    if entries.isEmpty {
+      return """
+        ## [\(name)]
+        """
+    }
+
     let validEntries = entries.filter { !Set(file.tags).intersection($0.tags).isEmpty }
     let usedTags = validEntries.flatMap(\.tags).uniqueValues().sorted {
       if let index1 = file.tags.firstIndex(of: $0),
