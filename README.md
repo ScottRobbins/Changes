@@ -1,6 +1,6 @@
-# ChangelogManager
+# Changes
 
-ChangelogManager is CLI tool (and in the future a framework) for creating Changelog entries and generating Changelogs and other documents from those.  
+Changes is CLI tool (and in the future a framework) for creating Changelog entries and generating Changelogs and other documents from those.  
 
 **Note:** This is still in early development.
 
@@ -20,32 +20,32 @@ You can define multiple files that all get generated with whatever tags they sho
 
 Add this to your package.swift file.
 ```swift
-.package(url: "https://github.com/SwiftBuildTools/ChangelogManager.git", branch: "master")
+.package(url: "https://github.com/SwiftBuildTools/Changes.git", branch: "master")
 ```
 
 Initialize your repository with a configuration file.
 ```bash
-$ swift run changelog init
+$ swift run changes init
 ```
 
-That will create a configuration file called `.changelog-manager.yml`. 
+That will create a configuration file called `.changes.yml`. 
 
 Add a changelog entry by following the CLI prompts.
 ```bash
-$ swift run changelog add
+$ swift run changes add
 ```
 
 It will then ask you this entry should be tagged with as well as a description of your Changelog entry.
 
 You can also provide this information as arguments.
 ```bash
-$ swift run changelog add --tags Added Minor --description "Added some new Ability!"
+$ swift run changes add --tags Added Minor --description "Added some new Ability!"
 ```
 (You can also use the shortened arguments of `-t` and `-d`)
 
 If you need to add an entry to an existing release*, you can speicfy that as an argument.
 ```bash
-$ swift run changelog add --release 1.0.0
+$ swift run changes add --release 1.0.0
 ```
 (You can also use the shortened argument of `-r`)
 
@@ -53,5 +53,5 @@ $ swift run changelog add --release 1.0.0
 
 If at any point in time you would like to regenerate your Changelog:
 ```bash
-$ swift run changelog regenerate
+$ swift run changes regenerate
 ```

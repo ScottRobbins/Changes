@@ -1,4 +1,4 @@
-struct ChangelogManagerConfig: Codable {
+struct ChangesConfig: Codable {
   struct ChangelogFile: Codable {
     let path: String
     let tags: [String]

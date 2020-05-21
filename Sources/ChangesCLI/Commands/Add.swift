@@ -37,13 +37,13 @@ struct Add: ParsableCommand {
 
   func validate() throws {
     guard
-      let configString = try? Folder.current.file(named: ".changelog-manager.yml").readAsString()
+      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
     else {
       throw ValidationError("No config found.")
     }
 
     let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangelogManagerConfig.self, from: configString) else {
+    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
       throw ValidationError("Invalid config file format.")
     }
 
@@ -57,7 +57,7 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         guard
           let _ = try? Folder.current.subfolder(
-            at: ".changelog-manager/releases/\(release.release)/\(release.droppingBuildMetadata)"
+            at: ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)"
           )
         else {
           throw ValidationError("Release \(release.droppingBuildMetadata) was not found.")
@@ -66,7 +66,7 @@ struct Add: ParsableCommand {
       else {
         guard
           let _ = try? Folder.current.subfolder(
-            at: ".changelog-manager/releases/\(release.release)"
+            at: ".changes/releases/\(release.release)"
           )
         else {
           throw ValidationError("Release \(release.release) was not found.")
@@ -77,13 +77,13 @@ struct Add: ParsableCommand {
 
   func run() throws {
     guard
-      let configString = try? Folder.current.file(named: ".changelog-manager.yml").readAsString()
+      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
     else {
       throw ValidationError("No config found.")
     }
 
     let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangelogManagerConfig.self, from: configString) else {
+    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
       throw ValidationError("Invalid config file format.")
     }
 
@@ -102,17 +102,17 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         outputFolder = try Folder.current.createSubfolderIfNeeded(
           at:
-            ".changelog-manager/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
+            ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
         )
       }
       else {
         outputFolder = try Folder.current.createSubfolderIfNeeded(
-          at: ".changelog-manager/releases/\(release.release)/entries"
+          at: ".changes/releases/\(release.release)/entries"
         )
       }
     }
     else {
-      outputFolder = try Folder.current.subfolder(named: ".changelog-manager/Unreleased")
+      outputFolder = try Folder.current.subfolder(named: ".changes/Unreleased")
     }
 
     let entry = ChangelogEntry(
@@ -127,7 +127,7 @@ struct Add: ParsableCommand {
     try ChangelogGenerator().regenerateChangelogs()
   }
 
-  private func getTags(with config: ChangelogManagerConfig) -> [String] {
+  private func getTags(with config: ChangesConfig) -> [String] {
     let _allTags = allTags(with: config)
     let tagString =
       _allTags.enumerated().map { (tag) -> String in
@@ -191,11 +191,11 @@ struct Add: ParsableCommand {
     }
   }
 
-  private func allTags(with config: ChangelogManagerConfig) -> [String] {
+  private func allTags(with config: ChangesConfig) -> [String] {
     Array(config.files.map(\.tags).joined())
   }
 
-  private func definedTag(matching tag: String, with config: ChangelogManagerConfig) -> String? {
+  private func definedTag(matching tag: String, with config: ChangesConfig) -> String? {
     return allTags(with: config).first { $0.lowercased() == tag.lowercased() }
   }
 }

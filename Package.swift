@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-  name: "ChangelogManager",
+  name: "Changes",
   platforms: [
     .macOS(.v10_12)
   ],
   products: [
-    .executable(name: "changelog", targets: ["ChangelogManager"])
+    .executable(name: "changes", targets: ["ChangesCLI"])
   ],
   dependencies: [
     .package(url: "https://github.com/JohnSundell/Files", from: "4.0.0"),
@@ -19,7 +19,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "ChangelogManager",
+      name: "ChangesCLI",
       dependencies: [
         "Files",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
@@ -28,8 +28,8 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "ChangelogManagerTests",
-      dependencies: ["ChangelogManager"]
+      name: "ChangesCLITests",
+      dependencies: ["ChangesCLI"]
     ),
   ]
 )
