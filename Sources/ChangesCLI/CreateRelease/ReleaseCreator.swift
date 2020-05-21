@@ -7,7 +7,7 @@ import Yams
 struct ReleaseCreator {
   func createRelease(version: Version) throws {
     let releaseFolder = try Folder.current.createSubfolderIfNeeded(
-      at: ".changelog-manager/releases/\(version.release)"
+      at: ".changes/releases/\(version.release)"
     )
     let encoder = YAMLEncoder()
     let releaseInfo = ReleaseInfo(version: version.release, createdAtDate: Date())
@@ -37,7 +37,7 @@ struct ReleaseCreator {
     }
 
     let entryFiles =
-      Array(try Folder.current.subfolder(at: ".changelog-manager/Unreleased").files)
+      Array(try Folder.current.subfolder(at: ".changes/Unreleased").files)
       + Array(try releaseFolder.subfolder(at: "entries").files)
     for entryFile in entryFiles {
       try entryFile.move(to: entriesFolder)

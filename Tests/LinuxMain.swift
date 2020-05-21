@@ -1,6 +1,6 @@
-import ChangelogManagerTests
+import ChangesCLITests
 import XCTest
 
 var tests = [XCTestCaseEntry]()
-tests += ChangelogManagerTests.allTests()
+tests += ChangesTests.allTests()
 XCTMain(tests)
