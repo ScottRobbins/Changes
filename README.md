@@ -43,15 +43,24 @@ $ swift run changes add --tags Added Minor --description "Added some new Ability
 ```
 (You can also use the shortened arguments of `-t` and `-d`)
 
-If you need to add an entry to an existing release*, you can speicfy that as an argument.
+If you need to add an entry to an existing release, you can speicfy that as an argument.
 ```bash
 $ swift run changes add --release 1.0.0
 ```
 (You can also use the shortened argument of `-r`)
 
-*Creating new releases has not yet been built
-
 If at any point in time you would like to regenerate your Changelog:
 ```bash
 $ swift run changes regenerate
+```
+
+If you want to create a release
+
+```bash
+$ swift run changes release 1.0.0
+```
+
+The tool also understands pre-release versions. For example: 
+```bash
+$ swift run changes release 1.0.0-alpha.1
 ```
