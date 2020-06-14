@@ -23,7 +23,7 @@ struct ChangelogGenerator {
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
     }
-    
+
     let releaseEntries = try getReleaseEntries(workingFolder: workingFolder)
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
     let unreleasedEntries = try getUnreleasedEntries(workingFolder: workingFolder)

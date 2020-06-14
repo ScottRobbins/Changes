@@ -40,7 +40,7 @@ struct Add: ParsableCommand {
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
     }
-    
+
     for tag in tags {
       guard definedTag(matching: tag, with: loadedConfig.config) != nil else {
         throw ValidationError("Tag \(tag) specified is not defined in config.")
@@ -74,7 +74,7 @@ struct Add: ParsableCommand {
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
     }
-    
+
     let tags: [String]
     if self.tags.isEmpty {
       tags = getTags(with: loadedConfig.config)

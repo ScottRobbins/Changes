@@ -10,7 +10,7 @@ struct ReleaseCreator {
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
     }
-    
+
     let releaseFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases/\(version.release)"
     )

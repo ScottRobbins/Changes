@@ -23,7 +23,7 @@ struct ConfigurationLoader {
         return .init(config: config, path: configFile.path)
       }
     }
-    
+
     throw ChangesError("No config found.")
   }
 }
