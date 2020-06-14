@@ -15,10 +15,9 @@ struct Release: ParsableCommand {
   var version: Version?
 
   func run() throws {
-    let config = try ConfigurationLoader().load()
     let version = self.version ?? getVersion()
     try ReleaseCreator().createRelease(version: version)
-    try ChangelogGenerator().regenerateChangelogs(config: config)
+    try ChangelogGenerator().regenerateChangelogs()
   }
 
   private func getVersion() -> Version {

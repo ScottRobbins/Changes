@@ -1,33 +1,29 @@
 import Files
 import Yams
 
-struct ConfigurationLoaderError: Error, CustomStringConvertible {
-  var message: String
-
-  public init(
-    _ message: String
-  ) {
-    self.message = message
-  }
-
-  public var description: String {
-    message
-  }
+struct LoadedChangesConfig {
+  let config: ChangesConfig
+  let path: String
 }
 
 struct ConfigurationLoader {
-  func load() throws -> ChangesConfig {
-    guard let configPath = try? Folder.current.file(named: ".changes.yml").path,
-      let configString = try? File(path: configPath).readAsString()
-    else {
-      throw ConfigurationLoaderError("No config found.")
-    }
+  func load() throws -> LoadedChangesConfig {
+    var _folder: Folder? = Folder.current
+    while let folder = _folder {
+      defer { _folder = folder.parent }
 
-    let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ConfigurationLoaderError("Invalid config file format.")
-    }
+      if let configFile = try? folder.file(named: ".changes.yml"),
+        let configString = try? configFile.readAsString()
+      {
+        let decoder = YAMLDecoder()
+        guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
+          throw ChangesError("Invalid config file format.")
+        }
 
-    return config
+        return .init(config: config, path: configFile.path)
+      }
+    }
+    
+    throw ChangesError("No config found.")
   }
 }

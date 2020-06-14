@@ -6,7 +6,12 @@ import Yams
 
 struct ReleaseCreator {
   func createRelease(version: Version) throws {
-    let releaseFolder = try Folder.current.createSubfolderIfNeeded(
+    let loadedConfig = try ConfigurationLoader().load()
+    guard let workingFolder = try File(path: loadedConfig.path).parent else {
+      throw ChangesError("Could not find folder of changes config.")
+    }
+    
+    let releaseFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases/\(version.release)"
     )
     let encoder = YAMLEncoder()
@@ -38,7 +43,7 @@ struct ReleaseCreator {
     }
 
     let entryFiles =
-      Array(try Folder.current.subfolder(at: ".changes/Unreleased").files)
+      Array(try workingFolder.subfolder(at: ".changes/Unreleased").files)
       + Array(try releaseFolder.subfolder(at: "entries").files)
     for entryFile in entryFiles {
       try entryFile.move(to: entriesFolder)

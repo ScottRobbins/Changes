@@ -8,7 +8,6 @@ struct RegenerateChangelog: ParsableCommand {
   )
 
   func run() throws {
-    let config = try ConfigurationLoader().load()
-    try ChangelogGenerator().regenerateChangelogs(config: config)
+    try ChangelogGenerator().regenerateChangelogs()
   }
 }
