@@ -18,9 +18,16 @@ You can define multiple files that all get generated with whatever tags they sho
 
 ### Getting Started
 
+Install via homebrew:
+```bash
+$ brew install scottrobbins/formulae/hoard
+```
+
+Or
+
 Add this to your package.swift file.
 ```swift
-.package(url: "https://github.com/SwiftBuildTools/Changes.git", branch: "master")
+.package(url: "https://github.com/SwiftBuildTools/Changes.git", .exact("0.1.0"))
 ```
 
 Initialize your repository with a configuration file.
