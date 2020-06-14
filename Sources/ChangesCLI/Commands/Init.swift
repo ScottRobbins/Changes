@@ -20,7 +20,8 @@ struct Init: ParsableCommand {
     let config = ChangesConfig(files: [
       .init(
         path: "./CHANGELOG.md",
-        tags: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+        tags: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"],
+        footerText: nil
       )
     ])
 
