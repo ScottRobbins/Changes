@@ -103,15 +103,28 @@ struct Add: ParsableCommand {
       outputFolder = try workingFolder.subfolder(named: ".changes/Unreleased")
     }
 
+    let date = Date()
     let entry = ChangelogEntry(
       tags: tags,
       description: description,
-      createdAtDate: Date()
+      createdAtDate: date
     )
     let encoder = YAMLEncoder()
     let outputString = try encoder.encode(entry)
 
-    try outputFolder.createFile(named: "\(UUID().uuidString).yml").write(outputString)
+    let dateFormatter = ISO8601DateFormatter()
+    dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
+    let dateString = dateFormatter.string(from: date)
+    let descriptionString =
+      description
+      .lowercased()
+      .components(separatedBy: .whitespacesAndNewlines)
+      .prefix(8)
+      .joined(separator: "-")
+    let suffix = UUID().uuidString.suffix(10)
+    try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).yml").write(
+      outputString
+    )
     try ChangelogGenerator().regenerateChangelogs()
   }
 
