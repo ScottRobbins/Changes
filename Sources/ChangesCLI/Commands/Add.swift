@@ -36,17 +36,7 @@ struct Add: ParsableCommand {
   var release: Version?
 
   func validate() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
-    }
-
-    let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
+    let config = try ConfigurationLoader().load()
     for tag in tags {
       guard definedTag(matching: tag, with: config) != nil else {
         throw ValidationError("Tag \(tag) specified is not defined in config.")
@@ -76,17 +66,7 @@ struct Add: ParsableCommand {
   }
 
   func run() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
-    }
-
-    let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
+    let config = try ConfigurationLoader().load()
     let tags: [String]
     if self.tags.isEmpty {
       tags = getTags(with: config)
@@ -124,7 +104,7 @@ struct Add: ParsableCommand {
     let outputString = try encoder.encode(entry)
 
     try outputFolder.createFile(named: "\(UUID().uuidString).yml").write(outputString)
-    try ChangelogGenerator().regenerateChangelogs()
+    try ChangelogGenerator().regenerateChangelogs(config: config)
   }
 
   private func getTags(with config: ChangesConfig) -> [String] {

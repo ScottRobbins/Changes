@@ -16,7 +16,8 @@ struct ReleaseCreator {
 
     let entriesFolder: Folder
     if version.isPrerelease {
-      guard !releaseFolder.containsSubfolder(named: version.droppingBuildMetadata.description) else {
+      guard !releaseFolder.containsSubfolder(named: version.droppingBuildMetadata.description)
+      else {
         throw ValidationError("Release \(version.droppingBuildMetadata) already exists")
       }
 

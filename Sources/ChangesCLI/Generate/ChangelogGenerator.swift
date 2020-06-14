@@ -10,25 +10,15 @@ struct ChangelogGenerator {
     let createdAtDate: Date
     let entries: [ChangelogEntry]
   }
-  
+
   let dateFormatter = ISO8601DateFormatter()
   let decoder = YAMLDecoder()
-  
+
   init() {
     dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
   }
 
-  func regenerateChangelogs() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
-    }
-
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
+  func regenerateChangelogs(config: ChangesConfig) throws {
     let releaseEntries = try getReleaseEntries()
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
     let unreleasedEntries = try getUnreleasedEntries()
@@ -171,10 +161,11 @@ struct ChangelogGenerator {
   ) -> String {
     let sectionNameString: String
     if let date = date {
-      let dateString = dateFormatter.string(from:date)
+      let dateString = dateFormatter.string(from: date)
       sectionNameString = "## [\(name)] - \(dateString)"
-    } else {
-       sectionNameString = "## [\(name)]"
+    }
+    else {
+      sectionNameString = "## [\(name)]"
     }
     if entries.isEmpty {
       return sectionNameString
