@@ -13,22 +13,24 @@ struct Release: ParsableCommand {
     )
   )
   var version: Version?
-  
+
   func run() throws {
     let version = self.version ?? getVersion()
     try ReleaseCreator().createRelease(version: version)
     try ChangelogGenerator().regenerateChangelogs()
   }
-  
+
   private func getVersion() -> Version {
     while true {
       print("Enter the version for this release:", terminator: " ")
       let readVersion = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
       if let version = try? Version(readVersion) {
         return version
-      } else if readVersion.isEmpty {
+      }
+      else if readVersion.isEmpty {
         print("Please enter a version number.")
-      } else {
+      }
+      else {
         print("\(readVersion) is not a valid version number.")
       }
     }

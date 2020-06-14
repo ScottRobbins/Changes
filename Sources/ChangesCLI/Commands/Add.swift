@@ -36,19 +36,13 @@ struct Add: ParsableCommand {
   var release: Version?
 
   func validate() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
+    let loadedConfig = try ConfigurationLoader().load()
+    guard let workingFolder = try File(path: loadedConfig.path).parent else {
+      throw ChangesError("Could not find folder of changes config.")
     }
-
-    let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
+    
     for tag in tags {
-      guard definedTag(matching: tag, with: config) != nil else {
+      guard definedTag(matching: tag, with: loadedConfig.config) != nil else {
         throw ValidationError("Tag \(tag) specified is not defined in config.")
       }
     }
@@ -56,7 +50,7 @@ struct Add: ParsableCommand {
     if let release = release {
       if release.isPrerelease {
         guard
-          let _ = try? Folder.current.subfolder(
+          let _ = try? workingFolder.subfolder(
             at: ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)"
           )
         else {
@@ -65,7 +59,7 @@ struct Add: ParsableCommand {
       }
       else {
         guard
-          let _ = try? Folder.current.subfolder(
+          let _ = try? workingFolder.subfolder(
             at: ".changes/releases/\(release.release)"
           )
         else {
@@ -76,23 +70,17 @@ struct Add: ParsableCommand {
   }
 
   func run() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
+    let loadedConfig = try ConfigurationLoader().load()
+    guard let workingFolder = try File(path: loadedConfig.path).parent else {
+      throw ChangesError("Could not find folder of changes config.")
     }
-
-    let decoder = YAMLDecoder()
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
+    
     let tags: [String]
     if self.tags.isEmpty {
-      tags = getTags(with: config)
+      tags = getTags(with: loadedConfig.config)
     }
     else {
-      tags = self.tags.compactMap { definedTag(matching: $0, with: config) }
+      tags = self.tags.compactMap { definedTag(matching: $0, with: loadedConfig.config) }
     }
 
     let description = self.description ?? getDescription()
@@ -100,19 +88,19 @@ struct Add: ParsableCommand {
     let outputFolder: Folder
     if let release = release {
       if release.isPrerelease {
-        outputFolder = try Folder.current.createSubfolderIfNeeded(
+        outputFolder = try workingFolder.createSubfolderIfNeeded(
           at:
             ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
         )
       }
       else {
-        outputFolder = try Folder.current.createSubfolderIfNeeded(
+        outputFolder = try workingFolder.createSubfolderIfNeeded(
           at: ".changes/releases/\(release.release)/entries"
         )
       }
     }
     else {
-      outputFolder = try Folder.current.subfolder(named: ".changes/Unreleased")
+      outputFolder = try workingFolder.subfolder(named: ".changes/Unreleased")
     }
 
     let entry = ChangelogEntry(

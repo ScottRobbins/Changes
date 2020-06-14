@@ -10,39 +10,35 @@ struct ChangelogGenerator {
     let createdAtDate: Date
     let entries: [ChangelogEntry]
   }
-  
+
   let dateFormatter = ISO8601DateFormatter()
   let decoder = YAMLDecoder()
-  
+
   init() {
     dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
   }
 
   func regenerateChangelogs() throws {
-    guard
-      let configString = try? Folder.current.file(named: ".changes.yml").readAsString()
-    else {
-      throw ValidationError("No config found.")
+    let loadedConfig = try ConfigurationLoader().load()
+    guard let workingFolder = try File(path: loadedConfig.path).parent else {
+      throw ChangesError("Could not find folder of changes config.")
     }
-
-    guard let config = try? decoder.decode(ChangesConfig.self, from: configString) else {
-      throw ValidationError("Invalid config file format.")
-    }
-
-    let releaseEntries = try getReleaseEntries()
+    
+    let releaseEntries = try getReleaseEntries(workingFolder: workingFolder)
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
-    let unreleasedEntries = try getUnreleasedEntries()
+    let unreleasedEntries = try getUnreleasedEntries(workingFolder: workingFolder)
 
-    for file in config.files {
+    for file in loadedConfig.config.files {
       try writeToChangelog(
         unreleasedEntries: unreleasedEntries,
         releaseEntries: sortedReleaseEntries,
-        file: file
+        file: file,
+        workingFolder: workingFolder
       )
     }
   }
 
-  private func getReleaseEntries() throws -> [ReleaseEntry] {
+  private func getReleaseEntries(workingFolder: Folder) throws -> [ReleaseEntry] {
     var releaseEntries = [ReleaseEntry]()
     var error: Error?
     let queue = DispatchQueue(
@@ -51,7 +47,7 @@ struct ChangelogGenerator {
       attributes: .concurrent
     )
     let group = DispatchGroup()
-    let releaseFolders = try Folder.current.createSubfolderIfNeeded(
+    let releaseFolders = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases"
     ).subfolders
 
@@ -111,8 +107,8 @@ struct ChangelogGenerator {
     return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
   }
 
-  private func getUnreleasedEntries() throws -> [ChangelogEntry] {
-    let unreleasedFolder = try Folder.current.createSubfolderIfNeeded(
+  private func getUnreleasedEntries(workingFolder: Folder) throws -> [ChangelogEntry] {
+    let unreleasedFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/Unreleased"
     )
     return try changelogEntries(folder: unreleasedFolder).sorted {
@@ -130,7 +126,8 @@ struct ChangelogGenerator {
   private func writeToChangelog(
     unreleasedEntries: [ChangelogEntry],
     releaseEntries: [ReleaseEntry],
-    file: ChangesConfig.ChangelogFile
+    file: ChangesConfig.ChangelogFile,
+    workingFolder: Folder
   ) throws {
     let unreleasedContentString = sectionString(
       name: "Unreleased",
@@ -160,7 +157,7 @@ struct ChangelogGenerator {
       \(releaseContentString)
       """.trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
 
-    try Folder.current.createFileIfNeeded(at: file.path).write(changelogString)
+    try workingFolder.createFileIfNeeded(at: file.path).write(changelogString)
   }
 
   private func sectionString(
@@ -171,10 +168,11 @@ struct ChangelogGenerator {
   ) -> String {
     let sectionNameString: String
     if let date = date {
-      let dateString = dateFormatter.string(from:date)
+      let dateString = dateFormatter.string(from: date)
       sectionNameString = "## [\(name)] - \(dateString)"
-    } else {
-       sectionNameString = "## [\(name)]"
+    }
+    else {
+      sectionNameString = "## [\(name)]"
     }
     if entries.isEmpty {
       return sectionNameString
