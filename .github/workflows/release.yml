@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: swift build -c release
       - name: Package
-        run: tar -C .build/release -cvzf changes.tar.gz change
+        run: tar -C .build/release -cvzf changes.tar.gz changes
       - name: Upload Build Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -73,7 +73,7 @@ jobs:
       - name: Build
         run: swift build -c release
       - name: Package
-        run: tar -C .build/release -cvzf changes.tar.gz change
+        run: tar -C .build/release -cvzf changes.tar.gz changes
       - name: Upload Build Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
