@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  pull_request: # Remove this, just used to test
+  push:
+    tags:
+      - v*
+
+jobs:
+  macOS:
+    runs-on: macos-latest
+    steps:
+      - name: Select latest available Xcode
+        uses: maxim-lobanov/setup-xcode@1.0
+        with:
+          xcode-version: latest
+      - uses: actions/checkout@v2
+      - name: Build
+        run: swift build -c release
+      - name: Package
+        run: tar -cvzf changes.tar.gz .build/release/changes
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Build Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: changes.tar.gz
+          asset_name: changes-macOS.tar.gz
+          asset_content_type: application/gzip
+
+
+      
