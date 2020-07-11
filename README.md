@@ -47,7 +47,7 @@ supports (if any are missing please open an issue).
 1. Download the needed binary
 
 ```bash
-$ curl -O https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-2-<target>.tar.gz
+$ curl -OL https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-2-<target>.tar.gz
 ```
 
 Or
