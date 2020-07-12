@@ -59,7 +59,7 @@ $ wget https://github.com/SwiftBuildTools/Changes/releases/download/<version>/ch
 2. Unpackage the binary
 
 ```bash
-$ tar -xvzf <asset>.tar.gz 
+$ tar -xvzf changes-swift-5-2-<target>.tar.gz 
 ```
 
 Put this executable somewhere in your PATH.
