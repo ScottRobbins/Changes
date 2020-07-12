@@ -43,6 +43,6 @@ final class ChangesCLITests: XCTestCase {
   }
 
   static var allTests = [
-    ("testExample", testExample),
+    ("testExample", testExample)
   ]
 }
