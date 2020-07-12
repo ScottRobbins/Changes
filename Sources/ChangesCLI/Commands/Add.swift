@@ -125,7 +125,7 @@ struct Add: ParsableCommand {
     try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).yml").write(
       outputString
     )
-    try ChangelogGenerator().regenerateChangelogs()
+    try ChangelogGenerator().regenerateAutomaticallyRegeneratableChangelogs()
   }
 
   private func getTags(with config: ChangesConfig) -> [String] {

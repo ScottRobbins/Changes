@@ -21,6 +21,7 @@ struct Init: ParsableCommand {
       .init(
         path: "./CHANGELOG.md",
         tags: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"],
+        automaticallyRegenerate: true,
         footerText: nil
       )
     ])

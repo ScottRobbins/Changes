@@ -18,7 +18,7 @@ struct ChangelogGenerator {
     dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
   }
 
-  func regenerateChangelogs() throws {
+  func regenerateAutomaticallyRegeneratableChangelogs() throws {
     let loadedConfig = try ConfigurationLoader().load()
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
@@ -28,7 +28,7 @@ struct ChangelogGenerator {
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
     let unreleasedEntries = try getUnreleasedEntries(workingFolder: workingFolder)
 
-    for file in loadedConfig.config.files {
+    for file in loadedConfig.config.files where file.automaticallyRegenerate {
       try writeToChangelog(
         unreleasedEntries: unreleasedEntries,
         releaseEntries: sortedReleaseEntries,
