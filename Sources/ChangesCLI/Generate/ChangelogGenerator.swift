@@ -18,8 +18,31 @@ struct ChangelogGenerator {
     dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
   }
 
-  func regenerateAutomaticallyRegeneratableChangelogs() throws {
+  func regenerateFiles(identifiers: [String]) throws {
     let loadedConfig = try ConfigurationLoader().load()
+    for identifier in identifiers {
+      guard loadedConfig.config.files.map(\.identifier).contains(identifier) else {
+        throw ChangesError(
+          "\(identifier) is not a valid identifier for a file defined in the config."
+        )
+      }
+    }
+
+    let files = loadedConfig.config.files.filter { identifiers.contains($0.identifier) }
+    try regenerateFiles(files, loadedConfig: loadedConfig)
+  }
+
+  func regenerateAutomaticallyRegeneratableFiles() throws {
+    let loadedConfig = try ConfigurationLoader().load()
+
+    let files = loadedConfig.config.files.filter(\.automaticallyRegenerate)
+    try regenerateFiles(files, loadedConfig: loadedConfig)
+  }
+
+  private func regenerateFiles(
+    _ files: [ChangesConfig.ChangelogFile],
+    loadedConfig: LoadedChangesConfig
+  ) throws {
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
     }
@@ -28,7 +51,7 @@ struct ChangelogGenerator {
     let sortedReleaseEntries = releaseEntries.sorted { $0.version > $1.version }
     let unreleasedEntries = try getUnreleasedEntries(workingFolder: workingFolder)
 
-    for file in loadedConfig.config.files where file.automaticallyRegenerate {
+    for file in files {
       try writeToChangelog(
         unreleasedEntries: unreleasedEntries,
         releaseEntries: sortedReleaseEntries,

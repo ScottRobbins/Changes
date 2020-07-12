@@ -1,5 +1,6 @@
 files:
-- path: ./CHANGELOG.md
+- identifier: changelog
+  path: ./CHANGELOG.md
   tags:
   - Added
   - Changed

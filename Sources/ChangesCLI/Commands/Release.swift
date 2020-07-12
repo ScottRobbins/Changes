@@ -17,7 +17,7 @@ struct Release: ParsableCommand {
   func run() throws {
     let version = self.version ?? getVersion()
     try ReleaseCreator().createRelease(version: version)
-    try ChangelogGenerator().regenerateAutomaticallyRegeneratableChangelogs()
+    try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
   }
 
   private func getVersion() -> Version {

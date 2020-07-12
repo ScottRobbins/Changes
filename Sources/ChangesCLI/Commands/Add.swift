@@ -43,7 +43,7 @@ struct Add: ParsableCommand {
 
     for tag in tags {
       guard definedTag(matching: tag, with: loadedConfig.config) != nil else {
-        throw ValidationError("Tag \(tag) specified is not defined in config.")
+        throw ValidationError("Tag \(tag) specified is not defined in the config.")
       }
     }
 
@@ -125,7 +125,7 @@ struct Add: ParsableCommand {
     try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).yml").write(
       outputString
     )
-    try ChangelogGenerator().regenerateAutomaticallyRegeneratableChangelogs()
+    try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
   }
 
   private func getTags(with config: ChangesConfig) -> [String] {
