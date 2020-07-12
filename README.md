@@ -66,7 +66,7 @@ Put this executable somewhere in your PATH.
 
 ### Usage
 
-__Note: If you're using the Swift Package Manager installation method, prepend `swift run` to the commands__
+_Note: If you're using the Swift Package Manager installation method, prepend `swift run` to the commands_
 
 Initialize your repository with a configuration file.
 ```bash
