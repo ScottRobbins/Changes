@@ -1,5 +1,6 @@
 files:
-- path: ./CHANGELOG.md
+- identifier: changelog
+  path: ./CHANGELOG.md
   tags:
   - Added
   - Changed
@@ -7,3 +8,4 @@ files:
   - Removed
   - Fixed
   - Security
+  automaticallyRegenerate: true
