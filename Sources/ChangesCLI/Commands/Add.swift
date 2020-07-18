@@ -129,9 +129,9 @@ struct Add: ParsableCommand {
   }
 
   private func getTags(with config: ChangesConfig) -> [String] {
-    let _allTags = allTags(with: config)
+    let allTags = config.tags
     let tagString =
-      _allTags.enumerated().map { (tag) -> String in
+      allTags.enumerated().map { (tag) -> String in
         "[\(tag.offset)]  \(tag.element)"
       }.joined(separator: "\n")
     print(
@@ -158,7 +158,7 @@ struct Add: ParsableCommand {
         return enteredTags
       }
       else if let number = Int(argument: readTag) {
-        if let tag = _allTags.element(atIndex: number) {
+        if let tag = allTags.element(atIndex: number) {
           enteredTags.append(tag)
         }
         else {
@@ -192,12 +192,8 @@ struct Add: ParsableCommand {
     }
   }
 
-  private func allTags(with config: ChangesConfig) -> [String] {
-    Array(config.files.map(\.tags).joined())
-  }
-
   private func definedTag(matching tag: String, with config: ChangesConfig) -> String? {
-    return allTags(with: config).first { $0.lowercased() == tag.lowercased() }
+    return config.tags.first { $0.lowercased() == tag.lowercased() }
   }
 }
 

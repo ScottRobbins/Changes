@@ -20,10 +20,28 @@ struct ConfigurationLoader {
           throw ChangesError("Invalid config file format.")
         }
 
+        try validateConfig(config)
+
         return .init(config: config, path: configFile.path)
       }
     }
 
     throw ChangesError("No config found.")
+  }
+
+  private func validateConfig(_ config: ChangesConfig) throws {
+    for file in config.files {
+      guard !file.tags.isEmpty else {
+        throw ChangesError(#"File "\#(file.identifier)" has no defined tags"#)
+      }
+
+      for tag in file.tags {
+        guard config.tags.contains(tag) else {
+          throw ChangesError(
+            #"File "\#(file.identifier)" contains tag "\#(tag)" that is not defined at the configuration level"#
+          )
+        }
+      }
+    }
   }
 }

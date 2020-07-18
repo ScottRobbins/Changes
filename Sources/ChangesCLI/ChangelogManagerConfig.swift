@@ -7,5 +7,6 @@ struct ChangesConfig: Codable {
     let footerText: String?
   }
 
+  let tags: [String]
   let files: [ChangelogFile]
 }

@@ -17,15 +17,19 @@ struct Init: ParsableCommand {
   }
 
   func run() throws {
-    let config = ChangesConfig(files: [
-      .init(
-        identifier: "changelog",
-        path: "./CHANGELOG.md",
-        tags: ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"],
-        automaticallyRegenerate: true,
-        footerText: nil
-      )
-    ])
+    let tags = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+    let config = ChangesConfig(
+      tags: tags,
+      files: [
+        .init(
+          identifier: "changelog",
+          path: "./CHANGELOG.md",
+          tags: tags,
+          automaticallyRegenerate: true,
+          footerText: nil
+        )
+      ]
+    )
 
     let encoder = YAMLEncoder()
     let fileString = try encoder.encode(config)

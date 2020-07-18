@@ -1,3 +1,10 @@
+tags:
+- Added
+- Changed
+- Deprecated
+- Removed
+- Fixed
+- Security
 files:
 - identifier: changelog
   path: ./CHANGELOG.md
