@@ -5,7 +5,7 @@ struct Changes: ParsableCommand {
     commandName: nil,
     abstract: "A utility and framework for managing and generating changelogs",
     version: "0.1.0",
-    subcommands: [Init.self, Add.self, Regenerate.self, Release.self]
+    subcommands: [Init.self, Add.self, Regenerate.self, Release.self, Releases.self]
   )
 }
 
