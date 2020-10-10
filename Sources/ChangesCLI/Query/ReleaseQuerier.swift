@@ -25,7 +25,45 @@ struct ReleaseQuerier {
     return releaseQueryItems(from: queriedReleases)
   }
 
+  func query(versions versionRange: ClosedRange<Version>) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
+  }
+
+  func query(versions versionRange: Range<Version>) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
+  }
+
+  func query(versions versionRange: PartialRangeFrom<Version>) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
+  }
+
+  func query(versions versionRange: PartialRangeUpTo<Version>) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
+  }
+
+  func query(versions versionRange: PartialRangeThrough<Version>) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
+  }
+
+  func queryUpToLatest(start startVersion: Version) throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    guard let latestRelease = try latestReleaseInfo(releases: releases) else {
+      return []
     }
+
+    let versionRange = startVersion...latestRelease.release.version
+    let queriedReleases = releases.filter { versionRange.contains($0.release.version) }
+    return releaseQueryItems(from: queriedReleases)
   }
 
   private func fetchReleases() throws -> [ReleaseAndPrereleaseInfo] {
