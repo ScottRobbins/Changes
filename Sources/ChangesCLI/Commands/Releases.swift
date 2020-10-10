@@ -43,15 +43,37 @@ struct Releases: ParsableCommand {
         throw ValidationError(#""\#(version)" is not a valid version"#)
       }
     }
+
+    guard versions.isEmpty || (start == nil && end == nil) else {
+      throw ValidationError("Cannot specify specific versions along with a version range")
+    }
   }
 
   func run() throws {
-    let explicitVersions = try versions.filter { $0 != "latest" }.map { try Version($0) }
-    let includeLatest = versions.contains("latest")
-    let queriedReleases = try ReleaseQuerier().query(
-      versions: explicitVersions,
-      includeLatest: includeLatest
-    )
+    let releaseQuerier = ReleaseQuerier()
+    let queriedReleases: [ReleaseQueryItem]
+    if !versions.isEmpty {
+      let explicitVersions = try versions.filter { $0 != "latest" }.map { try Version($0) }
+      let includeLatest = versions.contains("latest")
+      queriedReleases = try releaseQuerier.query(
+        versions: explicitVersions,
+        includeLatest: includeLatest
+      )
+    } else if let start = start, let end = end {
+      let startVersion = try Version(start)
+      let endVersion = try Version(end)
+
+      queriedReleases = try releaseQuerier.query(versions: startVersion...endVersion)
+    } else if let start = start {
+      let startVersion = try Version(start)
+      queriedReleases = try releaseQuerier.query(versions: startVersion...)
+    } else if let end = end {
+      let endVersion = try Version(end)
+      queriedReleases = try releaseQuerier.query(versions: ...endVersion)
+    } else {
+      queriedReleases = try releaseQuerier.queryAll()
+    }
+
     let response = ReleaseQueryResponse(releases: queriedReleases)
     let encoder = JSONEncoder()
     let releasesJsonData = try encoder.encode(response)
