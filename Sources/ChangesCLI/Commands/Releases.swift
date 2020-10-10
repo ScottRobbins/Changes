@@ -42,6 +42,30 @@ struct Releases: ParsableCommand {
       guard version == "latest" || Version.valid(string: version) else {
         throw ValidationError(#""\#(version)" is not a valid version"#)
       }
+
+      guard version == "latest" || (try! Version(version)).prerelease == nil else {
+        throw ValidationError("Cannot specify prerelease version")
+      }
+    }
+
+    if let start = start {
+      guard let version = try? Version(start) else {
+        throw ValidationError(#""\#(start)" is not a valid version"#)
+      }
+
+      guard version.prerelease == nil else {
+        throw ValidationError("Cannot specify prerelease version")
+      }
+    }
+
+    if let end = end {
+      guard let version = try? Version(end) else {
+        throw ValidationError(#""\#(end)" is not a valid version"#)
+      }
+
+      guard version.prerelease == nil else {
+        throw ValidationError("Cannot specify prerelease version")
+      }
     }
 
     guard versions.isEmpty || (start == nil && end == nil) else {
