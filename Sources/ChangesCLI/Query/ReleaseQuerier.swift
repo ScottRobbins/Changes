@@ -11,25 +11,20 @@ private struct ReleaseAndPrereleaseInfo {
 struct ReleaseQuerier {
   private let latest = "latest"
 
+  func queryAll() throws -> [ReleaseQueryItem] {
+    let releases = try fetchReleases()
+    return releaseQueryItems(from: releases)
+  }
+
   func query(versions: [Version], includeLatest: Bool) throws -> [ReleaseQueryItem] {
     let releases = try fetchReleases()
     let explicitReleases = try explicitReleaseInfo(releases: releases, versions: versions)
     let _latestReleaseInfo = includeLatest ? try latestReleaseInfo(releases: releases) : nil
 
     let queriedReleases = explicitReleases + [_latestReleaseInfo].compactMap { $0 }
-    return queriedReleases.map {
-      let prereleaseQueryItems = $0.prereleases.map { prerelease in
-        PrereleaseQueryItem(
-          version: prerelease.version.description,
-          createdAtDate: prerelease.createdAtDate
-        )
-      }.sorted { $0.version > $1.version }
+    return releaseQueryItems(from: queriedReleases)
+  }
 
-      return ReleaseQueryItem(
-        version: $0.release.version.description,
-        createdAtDate: $0.release.createdAtDate,
-        prereleases: prereleaseQueryItems
-      )
     }
   }
 
@@ -79,5 +74,22 @@ struct ReleaseQuerier {
     releases: [ReleaseAndPrereleaseInfo]
   ) throws -> ReleaseAndPrereleaseInfo? {
     return releases.sorted { $0.release.version > $1.release.version }.first
+  }
+
+  private func releaseQueryItems(from releases: [ReleaseAndPrereleaseInfo]) -> [ReleaseQueryItem] {
+    return releases.map {
+      let prereleaseQueryItems = $0.prereleases.map { prerelease in
+        PrereleaseQueryItem(
+          version: prerelease.version.description,
+          createdAtDate: prerelease.createdAtDate
+        )
+      }.sorted { $0.version > $1.version }
+
+      return ReleaseQueryItem(
+        version: $0.release.version.description,
+        createdAtDate: $0.release.createdAtDate,
+        prereleases: prereleaseQueryItems
+      )
+    }.sorted { $0.version > $1.version }
   }
 }
