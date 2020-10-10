@@ -1,7 +1,12 @@
 import ArgumentParser
+import Foundation
 import Version
 
 // Want to make sure the help mentions the magic keywords you can use
+
+struct ReleaseQueryResponse: Codable {
+  let releases: [ReleaseQueryItem]
+}
 
 struct Releases: ParsableCommand {
   static var configuration = CommandConfiguration(
@@ -32,14 +37,27 @@ struct Releases: ParsableCommand {
   )
   var end: String?
 
-  private let unreleased = "unreleased"
-  private let latest = "latest"
-
   func validate() throws {
-    // Check to make sure that any versions listed are either a valid release or magic keyword
+    for version in versions {
+      guard version == "latest" || Version.valid(string: version) else {
+        throw ValidationError(#""\#(version)" is not a valid version"#)
+      }
+    }
   }
 
   func run() throws {
-
+    let explicitVersions = try versions.filter { $0 != "latest" }.map { try Version($0) }
+    let includeLatest = versions.contains("latest")
+    let queriedReleases = try ReleaseQuerier().query(
+      versions: explicitVersions,
+      includeLatest: includeLatest
+    )
+    let response = ReleaseQueryResponse(releases: queriedReleases)
+    let encoder = JSONEncoder()
+    let releasesJsonData = try encoder.encode(response)
+    guard let responseJsonString = String(data: releasesJsonData, encoding: .utf8) else {
+      throw ChangesError("Could not create json string from response.")
+    }
+    print(responseJsonString)
   }
 }
