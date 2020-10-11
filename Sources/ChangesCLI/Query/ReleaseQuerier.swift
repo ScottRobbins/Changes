@@ -1,5 +1,6 @@
 import ArgumentParser
 import Files
+import Foundation
 import Version
 import Yams
 
@@ -72,9 +73,41 @@ struct ReleaseQuerier {
       throw ChangesError("Could not find folder of changes config.")
     }
 
-    return try workingFolder.createSubfolderIfNeeded(
+    var releases = [ReleaseAndPrereleaseInfo]()
+    var error: Error?
+    let queue = DispatchQueue(
+      label: "com.swiftbuildtools.changes.thread-safe-array",
+      qos: .userInitiated,
+      attributes: .concurrent
+    )
+    let group = DispatchGroup()
+    
+    let releaseFolders = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases"
-    ).subfolders.map(releaseInfo(for:))
+    ).subfolders
+
+    for releaseFolder in releaseFolders {
+      DispatchQueue.global(qos: .userInitiated).async(group: group) {
+        do {
+          let info = try releaseInfo(for: releaseFolder)
+          queue.sync(flags: .barrier) {
+            releases.append(info)
+          }
+        } catch let e {
+          queue.sync(flags: .barrier) {
+            error = e
+          }
+        }
+      }
+    }
+
+    group.wait()
+
+    if let error = error {
+      throw error
+    }
+
+    return releases
   }
 
   private func releaseInfo(for folder: Folder) throws -> ReleaseAndPrereleaseInfo {
