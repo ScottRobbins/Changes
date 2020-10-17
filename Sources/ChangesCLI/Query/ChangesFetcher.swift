@@ -21,62 +21,35 @@ struct ChangesFetcher {
   }
 
   private func releaseEntries(workingFolder: Folder) throws -> [ReleaseEntry] {
-    var releaseEntries = [ReleaseEntry]()
-    var error: Error?
-    let queue = DispatchQueue(
-      label: "com.swiftbuildtools.changes.thread-safe-array",
-      qos: .userInitiated,
-      attributes: .concurrent
-    )
-    let group = DispatchGroup()
     let releaseFolders = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases"
     ).subfolders
-
-    for releaseFolder in releaseFolders {
-      DispatchQueue.global(qos: .userInitiated).async(group: group) {
-        do {
-          let releaseInfo = try self.getReleaseInfo(for: releaseFolder)
-          let preReleaseFolders =
-            try releaseFolder
-            .subfolders
-            .filter { $0.name != "entries" }
-            .map {
-              (version: try self.getReleaseInfo(for: $0).version, folder: $0)
-            }
-            .sorted {
-              $0.version < $1.version
-            }
-            .map(\.folder)
-
-          let releaseFolders = preReleaseFolders + [releaseFolder]
-          let entries = try changelogEntries(releaseFolders: releaseFolders)
-
-          queue.sync(flags: .barrier) {
-            releaseEntries.append(
-              .init(
-                version: releaseInfo.version,
-                createdAtDate: releaseInfo.createdAtDate,
-                entries: entries
-              )
-            )
-          }
+    return try ConcurrentAccumulation.reduce(
+      Array(releaseFolders)
+    ) { (releaseFolder, container) in
+      let releaseInfo = try self.getReleaseInfo(for: releaseFolder)
+      let preReleaseFolders =
+        try releaseFolder
+        .subfolders
+        .filter { $0.name != "entries" }
+        .map {
+          (version: try self.getReleaseInfo(for: $0).version, folder: $0)
         }
-        catch let e {
-          queue.sync(flags: .barrier) {
-            error = e
-          }
+        .sorted {
+          $0.version < $1.version
         }
-      }
+        .map(\.folder)
+
+      let releaseFolders = preReleaseFolders + [releaseFolder]
+      let entries = try changelogEntries(releaseFolders: releaseFolders)
+      container.add(
+        .init(
+          version: releaseInfo.version,
+          createdAtDate: releaseInfo.createdAtDate,
+          entries: entries
+        )
+      )
     }
-
-    group.wait()
-
-    if let error = error {
-      throw error
-    }
-
-    return releaseEntries
   }
 
   private func unreleasedEntries(workingFolder: Folder) throws -> [ChangelogEntry] {

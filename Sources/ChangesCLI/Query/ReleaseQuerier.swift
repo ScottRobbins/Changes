@@ -73,41 +73,15 @@ struct ReleaseQuerier {
       throw ChangesError("Could not find folder of changes config.")
     }
 
-    var releases = [ReleaseAndPrereleaseInfo]()
-    var error: Error?
-    let queue = DispatchQueue(
-      label: "com.swiftbuildtools.changes.thread-safe-array",
-      qos: .userInitiated,
-      attributes: .concurrent
-    )
-    let group = DispatchGroup()
-    
     let releaseFolders = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases"
     ).subfolders
 
-    for releaseFolder in releaseFolders {
-      DispatchQueue.global(qos: .userInitiated).async(group: group) {
-        do {
-          let info = try releaseInfo(for: releaseFolder)
-          queue.sync(flags: .barrier) {
-            releases.append(info)
-          }
-        } catch let e {
-          queue.sync(flags: .barrier) {
-            error = e
-          }
-        }
-      }
+    return try ConcurrentAccumulation.reduce(
+      Array(releaseFolders)
+    ) { (releaseFolder, container) in
+      container.add(try releaseInfo(for: releaseFolder))
     }
-
-    group.wait()
-
-    if let error = error {
-      throw error
-    }
-
-    return releases
   }
 
   private func releaseInfo(for folder: Folder) throws -> ReleaseAndPrereleaseInfo {
