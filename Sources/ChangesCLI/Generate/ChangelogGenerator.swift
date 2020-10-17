@@ -65,10 +65,11 @@ struct ChangelogGenerator {
     )
 
     let releaseContentString = releaseEntries.map { releaseEntry in
+      let entries = releaseEntry.entries + releaseEntry.prereleases.flatMap(\.entries)
       return sectionString(
         name: releaseEntry.version.description,
         date: releaseEntry.createdAtDate,
-        entries: releaseEntry.entries,
+        entries: entries,
         file: file
       )
     }.joined(separator: "\n\n\n")

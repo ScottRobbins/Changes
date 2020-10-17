@@ -28,25 +28,27 @@ struct ChangesFetcher {
       Array(releaseFolders)
     ) { (releaseFolder, container) in
       let releaseInfo = try self.getReleaseInfo(for: releaseFolder)
-      let preReleaseFolders =
+      let prereleaseEntries: [PrereleaseEntry] =
         try releaseFolder
         .createSubfolderIfNeeded(withName: "prereleases")
         .subfolders
         .map {
-          (version: try self.getReleaseInfo(for: $0).version, folder: $0)
+          let prereleaseInfo = try self.getReleaseInfo(for: $0)
+          let prereleaseEntries = try self.changelogEntries(releaseFolder: $0)
+          return PrereleaseEntry(
+            version: prereleaseInfo.version,
+            createdAtDate: prereleaseInfo.createdAtDate,
+            entries: prereleaseEntries
+          )
         }
-        .sorted {
-          $0.version < $1.version
-        }
-        .map(\.folder)
+        .sorted { $0.version < $1.version }
 
-      let releaseFolders = preReleaseFolders + [releaseFolder]
-      let entries = try changelogEntries(releaseFolders: releaseFolders)
       container.add(
         .init(
           version: releaseInfo.version,
           createdAtDate: releaseInfo.createdAtDate,
-          entries: entries
+          entries: try self.changelogEntries(releaseFolder: releaseFolder),
+          prereleases: prereleaseEntries
         )
       )
     }
@@ -54,9 +56,9 @@ struct ChangesFetcher {
 
   private func unreleasedEntries(workingFolder: Folder) throws -> [ChangelogEntry] {
     let unreleasedFolder = try workingFolder.createSubfolderIfNeeded(
-      at: ".changes/unreleased/entries"
+      at: ".changes/unreleased"
     )
-    return try changelogEntries(entriesFolder: unreleasedFolder)
+    return try changelogEntries(releaseFolder: unreleasedFolder)
   }
 
   private func getReleaseInfo(for folder: Folder) throws -> ReleaseInfo {
@@ -64,20 +66,12 @@ struct ChangesFetcher {
     return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
   }
 
-  private func changelogEntries(releaseFolders: [Folder]) throws -> [ChangelogEntry] {
-    try releaseFolders.flatMap {
-      try self.changelogEntries(
-        entriesFolder: $0.createSubfolderIfNeeded(at: "entries")
-      ).sorted {
-        $0.createdAtDate < $1.createdAtDate
-      }
-    }
-  }
-
-  private func changelogEntries(entriesFolder: Folder) throws -> [ChangelogEntry] {
-    return try entriesFolder.files.map { file in
+  private func changelogEntries(releaseFolder: Folder) throws -> [ChangelogEntry] {
+    return try releaseFolder.createSubfolderIfNeeded(withName: "entries").files.map { file in
       let fileString = try file.readAsString()
       return try decoder.decode(ChangelogEntry.self, from: fileString)
+    }.sorted {
+      $0.createdAtDate < $1.createdAtDate
     }
   }
 }
@@ -89,6 +83,14 @@ extension ChangesFetcher {
   }
 
   struct ReleaseEntry {
+    let version: Version
+    let createdAtDate: Date
+    let entries: [ChangelogEntry]
+    let prereleases: [PrereleaseEntry]
+  }
+
+  // Change it to actually set prerelease entries and not put all of those in the regular entries
+  struct PrereleaseEntry {
     let version: Version
     let createdAtDate: Date
     let entries: [ChangelogEntry]
