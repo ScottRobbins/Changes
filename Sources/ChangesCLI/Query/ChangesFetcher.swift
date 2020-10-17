@@ -49,14 +49,8 @@ struct ChangesFetcher {
             }
             .map(\.folder)
 
-          let entryFolders = preReleaseFolders + [releaseFolder]
-          let entries = try entryFolders.flatMap {
-            try self.changelogEntries(
-              entriesFolder: $0.createSubfolderIfNeeded(at: "entries")
-            ).sorted {
-              $0.createdAtDate < $1.createdAtDate
-            }
-          }
+          let releaseFolders = preReleaseFolders + [releaseFolder]
+          let entries = try changelogEntries(releaseFolders: releaseFolders)
 
           queue.sync(flags: .barrier) {
             releaseEntries.append(
@@ -95,6 +89,16 @@ struct ChangesFetcher {
   private func getReleaseInfo(for folder: Folder) throws -> ReleaseInfo {
     let releaseInfoString = try folder.file(named: "info.yml").readAsString()
     return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
+  }
+
+  private func changelogEntries(releaseFolders: [Folder]) throws -> [ChangelogEntry] {
+    try releaseFolders.flatMap {
+      try self.changelogEntries(
+        entriesFolder: $0.createSubfolderIfNeeded(at: "entries")
+      ).sorted {
+        $0.createdAtDate < $1.createdAtDate
+      }
+    }
   }
 
   private func changelogEntries(entriesFolder: Folder) throws -> [ChangelogEntry] {
