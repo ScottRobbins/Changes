@@ -54,7 +54,7 @@ struct ChangesFetcher {
 
   private func unreleasedEntries(workingFolder: Folder) throws -> [ChangelogEntry] {
     let unreleasedFolder = try workingFolder.createSubfolderIfNeeded(
-      at: ".changes/Unreleased"
+      at: ".changes/unreleased"
     )
     return try changelogEntries(entriesFolder: unreleasedFolder)
   }

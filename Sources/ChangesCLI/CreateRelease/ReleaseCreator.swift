@@ -43,7 +43,7 @@ struct ReleaseCreator {
     }
 
     let entryFiles =
-      Array(try workingFolder.subfolder(at: ".changes/Unreleased").files)
+      Array(try workingFolder.subfolder(at: ".changes/unreleased").files)
       + Array(try releaseFolder.subfolder(at: "entries").files)
     for entryFile in entryFiles {
       try entryFile.move(to: entriesFolder)
