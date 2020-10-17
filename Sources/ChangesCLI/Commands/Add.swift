@@ -149,7 +149,7 @@ struct Add: ParsableCommand {
         print("Enter a tag:", terminator: " ")
       }
       else {
-        print("Enter anoter tag, or press enter if done:", terminator: " ")
+        print("Enter another tag (Press enter if done):", terminator: " ")
       }
 
       let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
