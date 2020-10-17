@@ -119,6 +119,12 @@ struct Add: ParsableCommand {
       description
       .lowercased()
       .components(separatedBy: .whitespacesAndNewlines)
+      .map {
+        $0.components(
+          separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-")).inverted
+        )
+        .joined()
+      }
       .prefix(8)
       .joined(separator: "-")
     let suffix = UUID().uuidString.suffix(10)
