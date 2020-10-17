@@ -30,8 +30,8 @@ struct ChangesFetcher {
       let releaseInfo = try self.getReleaseInfo(for: releaseFolder)
       let preReleaseFolders =
         try releaseFolder
+        .createSubfolderIfNeeded(withName: "prereleases")
         .subfolders
-        .filter { $0.name != "entries" }
         .map {
           (version: try self.getReleaseInfo(for: $0).version, folder: $0)
         }

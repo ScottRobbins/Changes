@@ -89,7 +89,8 @@ struct ReleaseQuerier {
     let decoder = YAMLDecoder()
     let release = try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
 
-    let prereleases: [ReleaseInfo] = try folder.subfolders.filter { Version.valid(string: $0.name) }
+    let prereleases: [ReleaseInfo] = try folder.createSubfolderIfNeeded(withName: "prereleases")
+      .subfolders
       .map {
         let prereleaseInfoString = try $0.file(named: "info.yml").readAsString()
         return try decoder.decode(ReleaseInfo.self, from: prereleaseInfoString)

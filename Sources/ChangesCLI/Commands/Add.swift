@@ -51,7 +51,7 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         guard
           let _ = try? workingFolder.subfolder(
-            at: ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)"
+            at: ".changes/releases/\(release.release)/prereleases/\(release.droppingBuildMetadata)"
           )
         else {
           throw ValidationError("Release \(release.droppingBuildMetadata) was not found.")
@@ -90,7 +90,7 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         outputFolder = try workingFolder.createSubfolderIfNeeded(
           at:
-            ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
+            ".changes/releases/\(release.release)/prereleases/\(release.droppingBuildMetadata)/entries"
         )
       }
       else {
