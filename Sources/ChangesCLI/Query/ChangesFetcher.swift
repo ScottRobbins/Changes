@@ -52,7 +52,7 @@ struct ChangesFetcher {
           let entryFolders = preReleaseFolders + [releaseFolder]
           let entries = try entryFolders.flatMap {
             try self.changelogEntries(
-              folder: $0.createSubfolderIfNeeded(at: "entries")
+              entriesFolder: $0.createSubfolderIfNeeded(at: "entries")
             ).sorted {
               $0.createdAtDate < $1.createdAtDate
             }
@@ -89,7 +89,7 @@ struct ChangesFetcher {
     let unreleasedFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/Unreleased"
     )
-    return try changelogEntries(folder: unreleasedFolder)
+    return try changelogEntries(entriesFolder: unreleasedFolder)
   }
 
   private func getReleaseInfo(for folder: Folder) throws -> ReleaseInfo {
@@ -97,8 +97,8 @@ struct ChangesFetcher {
     return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
   }
 
-  private func changelogEntries(folder: Folder) throws -> [ChangelogEntry] {
-    return try folder.files.map { file in
+  private func changelogEntries(entriesFolder: Folder) throws -> [ChangelogEntry] {
+    return try entriesFolder.files.map { file in
       let fileString = try file.readAsString()
       return try decoder.decode(ChangelogEntry.self, from: fileString)
     }
