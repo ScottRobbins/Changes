@@ -38,7 +38,7 @@ struct Init: ParsableCommand {
     let changelogsFolder = try Folder.current.createSubfolderIfNeeded(
       withName: ".changes"
     )
-    try changelogsFolder.createSubfolderIfNeeded(withName: "Unreleased")
+    try changelogsFolder.createSubfolderIfNeeded(withName: "unreleased")
     try changelogsFolder.createSubfolderIfNeeded(withName: "releases")
   }
 }

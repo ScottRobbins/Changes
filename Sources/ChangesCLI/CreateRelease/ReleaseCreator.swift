@@ -17,17 +17,20 @@ struct ReleaseCreator {
     let encoder = YAMLEncoder()
     let releaseInfo = ReleaseInfo(version: version.release, createdAtDate: Date())
     let outputString = try encoder.encode(releaseInfo)
-    try releaseFolder.createFileIfNeeded(withName: "info.yml").write(outputString)
+    try releaseFolder.createFileIfNeeded(at: "info.yml").write(outputString)
 
     let entriesFolder: Folder
     if version.isPrerelease {
-      guard !releaseFolder.containsSubfolder(named: version.droppingBuildMetadata.description)
+      guard
+        !releaseFolder.containsSubfolder(
+          at: "prereleases/\(version.droppingBuildMetadata.description)"
+        )
       else {
         throw ValidationError("Release \(version.droppingBuildMetadata) already exists")
       }
 
       let preReleaseFolder = try releaseFolder.createSubfolderIfNeeded(
-        withName: version.droppingBuildMetadata.description
+        at: "prereleases/\(version.droppingBuildMetadata.description)"
       )
       let preReleaseInfo = ReleaseInfo(
         version: version.droppingBuildMetadata,
@@ -43,7 +46,7 @@ struct ReleaseCreator {
     }
 
     let entryFiles =
-      Array(try workingFolder.subfolder(at: ".changes/Unreleased").files)
+      Array(try workingFolder.subfolder(at: ".changes/unreleased/entries").files)
       + Array(try releaseFolder.subfolder(at: "entries").files)
     for entryFile in entryFiles {
       try entryFile.move(to: entriesFolder)

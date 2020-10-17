@@ -51,7 +51,7 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         guard
           let _ = try? workingFolder.subfolder(
-            at: ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)"
+            at: ".changes/releases/\(release.release)/prereleases/\(release.droppingBuildMetadata)"
           )
         else {
           throw ValidationError("Release \(release.droppingBuildMetadata) was not found.")
@@ -90,7 +90,7 @@ struct Add: ParsableCommand {
       if release.isPrerelease {
         outputFolder = try workingFolder.createSubfolderIfNeeded(
           at:
-            ".changes/releases/\(release.release)/\(release.droppingBuildMetadata)/entries"
+            ".changes/releases/\(release.release)/prereleases/\(release.droppingBuildMetadata)/entries"
         )
       }
       else {
@@ -100,7 +100,7 @@ struct Add: ParsableCommand {
       }
     }
     else {
-      outputFolder = try workingFolder.subfolder(named: ".changes/Unreleased")
+      outputFolder = try workingFolder.subfolder(named: ".changes/unreleased/entries")
     }
 
     let date = Date()
@@ -119,6 +119,12 @@ struct Add: ParsableCommand {
       description
       .lowercased()
       .components(separatedBy: .whitespacesAndNewlines)
+      .map {
+        $0.components(
+          separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-")).inverted
+        )
+        .joined()
+      }
       .prefix(8)
       .joined(separator: "-")
     let suffix = UUID().uuidString.suffix(10)
@@ -149,7 +155,7 @@ struct Add: ParsableCommand {
         print("Enter a tag:", terminator: " ")
       }
       else {
-        print("Enter anoter tag, or press enter if done:", terminator: " ")
+        print("Enter another tag (Press enter if done):", terminator: " ")
       }
 
       let readTag = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
