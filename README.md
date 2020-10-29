@@ -109,3 +109,11 @@ The tool also understands pre-release versions. For example:
 ```bash
 $ changes release 1.0.0-alpha.1
 ```
+
+Examples of querying for releases:
+
+```bash
+$ changes releases 1.0.0 1.1.0 latest
+$ changes releases --start 1.0.0 --end 1.1.0
+$ changes releases --start 1.1.0
+```
