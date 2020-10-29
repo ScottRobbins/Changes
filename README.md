@@ -5,20 +5,25 @@ Changes is CLI tool (and in the future a framework) for creating Changelog entri
 **Note:** This is still in early development. API is subject to breakage between minor versions below 1.0.0
 
 1. [How does it work?](#how-does-it-work)
-2. [Installation](#installation)
-3. [Usage](#usage)
+2. [Why build this tool?](#why-build-this-tool)
+3. [Installation](#installation)
+4. [Usage](#usage)
 
 ### How does it work? 
 
-When you run the CLI tool, it will create a "Changelog Entry", which is a YAML file containing the description 
-of your entry, when it was added and what to tag the entry as. It will then use these YAML files to 
-generate / regenerate your changelog.
+Changes entries are stored as YAML files, categorized by what releases they are a part of. These entries contain metadata, such as a message as well as one or more tags. 
 
 Tags might include things you would want in a Changelog (Added, Removed, Fixed, etc), but you may have 
 other tags for separate files (perhaps a "Release Note" tag, a tag to generate notes for QA, or a tag that denotes 
 whether this change will require a major/minor/patch version bump). 
 
-You can define multiple files that all get generated with whatever tags they should understand.
+Changes can use these entries and releases to generate changelog files, and these changes and releases can also be queried.
+
+### Why build this tool?
+
+There are 2 main reasons:
+1. Changelog files, when used in a team environment, have a tendency to create frequent merge conflicts. These aren't difficult to resolve, but they are frequent and a hassle. 
+2. Being able to add extra metadata to your changes that is easily queryable opens the door to further automation. This can be used to generate release notes, notes for QA, determine release version numbers and more. 
 
 ### Installation
 
@@ -108,4 +113,12 @@ $ changes release 1.0.0
 The tool also understands pre-release versions. For example: 
 ```bash
 $ changes release 1.0.0-alpha.1
+```
+
+Examples of querying for releases:
+
+```bash
+$ changes releases 1.0.0 1.1.0 latest
+$ changes releases --start 1.0.0 --end 1.1.0
+$ changes releases --start 1.1.0
 ```
