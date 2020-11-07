@@ -12,7 +12,7 @@ struct Regenerate: ParsableCommand {
       "Specify the files you would like to regenerate."
     )
   )
-  var identifiers: [String]
+  var identifiers: [String] = []
 
   func validate() throws {
     let loadedConfig = try ConfigurationLoader().load()

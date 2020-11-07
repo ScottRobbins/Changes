@@ -16,7 +16,7 @@ struct Add: ParsableCommand {
       "Specify one or more tags for your changelog entry."
     )
   )
-  var tags: [String]
+  var tags: [String] = []
 
   @Option(
     name: .shortAndLong,
