@@ -2,7 +2,6 @@ import ArgumentParser
 import Files
 import Foundation
 import Version
-import Yams
 
 struct Add: ParsableCommand {
   static var configuration = CommandConfiguration(
@@ -109,7 +108,8 @@ struct Add: ParsableCommand {
       description: description,
       createdAtDate: date
     )
-    let encoder = YAMLEncoder()
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
     let outputString = try encoder.encode(entry)
 
     let dateFormatter = ISO8601DateFormatter()
@@ -128,7 +128,7 @@ struct Add: ParsableCommand {
       .prefix(8)
       .joined(separator: "-")
     let suffix = UUID().uuidString.suffix(10)
-    try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).yml").write(
+    try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).json").write(
       outputString
     )
     try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
