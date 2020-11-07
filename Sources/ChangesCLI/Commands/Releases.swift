@@ -19,7 +19,7 @@ struct Releases: ParsableCommand {
       "Specify the versions to query for."
     )
   )
-  var versions: [String]
+  var versions: [String] = []
 
   @Option(
     name: .shortAndLong,
