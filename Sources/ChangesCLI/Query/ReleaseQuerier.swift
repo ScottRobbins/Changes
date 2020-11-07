@@ -2,7 +2,6 @@ import ArgumentParser
 import Files
 import Foundation
 import Version
-import Yams
 
 private struct ReleaseAndPrereleaseInfo {
   let release: ReleaseInfo
@@ -85,15 +84,15 @@ struct ReleaseQuerier {
   }
 
   private func releaseInfo(for folder: Folder) throws -> ReleaseAndPrereleaseInfo {
-    let releaseInfoString = try folder.file(named: "info.yml").readAsString()
-    let decoder = YAMLDecoder()
-    let release = try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
+    let releaseInfo = try folder.file(named: "info.json").read()
+    let decoder = JSONDecoder()
+    let release = try decoder.decode(ReleaseInfo.self, from: releaseInfo)
 
     let prereleases: [ReleaseInfo] = try folder.createSubfolderIfNeeded(withName: "prereleases")
       .subfolders
       .map {
-        let prereleaseInfoString = try $0.file(named: "info.yml").readAsString()
-        return try decoder.decode(ReleaseInfo.self, from: prereleaseInfoString)
+        let prereleaseInfo = try $0.file(named: "info.json").read()
+        return try decoder.decode(ReleaseInfo.self, from: prereleaseInfo)
       }
 
     return ReleaseAndPrereleaseInfo(release: release, prereleases: prereleases)

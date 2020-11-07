@@ -2,11 +2,9 @@ import ArgumentParser
 import Files
 import Foundation
 import Version
-import Yams
 
 struct ChangelogGenerator {
   private let dateFormatter = ISO8601DateFormatter()
-  private let decoder = YAMLDecoder()
 
   init() {
     dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]

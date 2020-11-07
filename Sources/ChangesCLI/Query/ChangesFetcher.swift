@@ -1,10 +1,9 @@
 import Files
 import Foundation
 import Version
-import Yams
 
 struct ChangesFetcher {
-  private let decoder = YAMLDecoder()
+  private let decoder = JSONDecoder()
 
   func fetch() throws -> ChangesFetcher.ReleaseAndUnreleasedEntries {
     let loadedConfig = try ConfigurationLoader().load()
@@ -62,14 +61,14 @@ struct ChangesFetcher {
   }
 
   private func getReleaseInfo(for folder: Folder) throws -> ReleaseInfo {
-    let releaseInfoString = try folder.file(named: "info.yml").readAsString()
-    return try decoder.decode(ReleaseInfo.self, from: releaseInfoString)
+    let releaseInfo = try folder.file(named: "info.json").read()
+    return try decoder.decode(ReleaseInfo.self, from: releaseInfo)
   }
 
   private func changelogEntries(releaseFolder: Folder) throws -> [ChangelogEntry] {
     return try releaseFolder.createSubfolderIfNeeded(withName: "entries").files.map { file in
-      let fileString = try file.readAsString()
-      return try decoder.decode(ChangelogEntry.self, from: fileString)
+      let file = try file.read()
+      return try decoder.decode(ChangelogEntry.self, from: file)
     }.sorted {
       $0.createdAtDate < $1.createdAtDate
     }

@@ -2,7 +2,6 @@ import ArgumentParser
 import Files
 import Foundation
 import Version
-import Yams
 
 struct ReleaseCreator {
   func createRelease(version: Version) throws {
@@ -14,10 +13,11 @@ struct ReleaseCreator {
     let releaseFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases/\(version.release)"
     )
-    let encoder = YAMLEncoder()
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
     let releaseInfo = ReleaseInfo(version: version.release, createdAtDate: Date())
     let outputString = try encoder.encode(releaseInfo)
-    try releaseFolder.createFileIfNeeded(at: "info.yml").write(outputString)
+    try releaseFolder.createFileIfNeeded(at: "info.json").write(outputString)
 
     let entriesFolder: Folder
     if version.isPrerelease {
@@ -37,7 +37,7 @@ struct ReleaseCreator {
         createdAtDate: Date()
       )
       let outputString = try encoder.encode(preReleaseInfo)
-      try preReleaseFolder.createFile(named: "info.yml").write(outputString)
+      try preReleaseFolder.createFile(named: "info.json").write(outputString)
       entriesFolder = try preReleaseFolder.createSubfolderIfNeeded(withName: "entries")
       try releaseFolder.createSubfolderIfNeeded(withName: "entries")
     }
