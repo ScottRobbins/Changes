@@ -11,7 +11,7 @@ Changes is CLI tool (and in the future a framework) for creating Changelog entri
 
 ### How does it work? 
 
-Changes entries are stored as YAML files, categorized by what releases they are a part of. These entries contain metadata, such as a message as well as one or more tags. 
+Changes entries are stored as JSON files, categorized by what releases they are a part of. These entries contain metadata, such as a message as well as one or more tags. 
 
 Tags might include things you would want in a Changelog (Added, Removed, Fixed, etc), but you may have 
 other tags for separate files (perhaps a "Release Note" tag, a tag to generate notes for QA, or a tag that denotes 
@@ -22,7 +22,7 @@ Changes can use these entries and releases to generate changelog files, and thes
 ### Why build this tool?
 
 There are 2 main reasons:
-1. Changelog files, when used in a team environment, have a tendency to create frequent merge conflicts. These aren't difficult to resolve, but they are frequent and a hassle. 
+1. Changelog files, when used in a team environment, have a tendency to create merge conflicts. These aren't difficult to resolve, but they are frequent and a hassle. 
 2. Being able to add extra metadata to your changes that is easily queryable opens the door to further automation. This can be used to generate release notes, notes for QA, determine release version numbers and more. 
 
 ### Installation
