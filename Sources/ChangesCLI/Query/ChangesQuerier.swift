@@ -2,10 +2,10 @@ import Files
 import Foundation
 import Version
 
-struct ChangesFetcher {
+struct ChangesQuerier {
   private let decoder = JSONDecoder()
 
-  func fetch() throws -> ChangesFetcher.ReleaseAndUnreleasedEntries {
+  func queryAllByRelease() throws -> ChangesQuerier.ReleaseAndUnreleasedEntries {
     let loadedConfig = try ConfigurationLoader().load()
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
@@ -13,7 +13,7 @@ struct ChangesFetcher {
 
     let _releaseEntries = try releaseEntries(workingFolder: workingFolder)
     let _unreleasedEntries = try unreleasedEntries(workingFolder: workingFolder)
-    return ChangesFetcher.ReleaseAndUnreleasedEntries(
+    return ChangesQuerier.ReleaseAndUnreleasedEntries(
       unreleasedEntries: _unreleasedEntries,
       releaseEntries: _releaseEntries
     )
@@ -75,7 +75,7 @@ struct ChangesFetcher {
   }
 }
 
-extension ChangesFetcher {
+extension ChangesQuerier {
   struct ReleaseAndUnreleasedEntries {
     let unreleasedEntries: [ChangelogEntry]
     let releaseEntries: [ReleaseEntry]
