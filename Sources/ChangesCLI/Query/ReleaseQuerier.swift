@@ -1,4 +1,3 @@
-import ArgumentParser
 import Files
 import Foundation
 import Version
@@ -108,7 +107,7 @@ struct ReleaseQuerier {
           $0.release.version == realVersion
         }
         guard let matchedRelease = _matchedRelease else {
-          throw ValidationError(#"Version "\#(realVersion)" was not found"#)
+          throw ChangesError(#"Version "\#(realVersion)" was not found"#)
         }
 
         return matchedRelease
