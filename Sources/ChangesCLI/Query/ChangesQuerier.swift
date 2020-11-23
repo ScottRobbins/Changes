@@ -9,7 +9,7 @@ struct ChangesQuerier {
     return _decoder
   }()
 
-  func queryAllByRelease() throws -> ChangesQuerier.ReleaseAndUnreleasedEntries {
+  func queryAllByRelease() throws -> ReleaseAndUnreleasedEntries {
     let loadedConfig = try ConfigurationLoader().load()
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
       throw ChangesError("Could not find folder of changes config.")
