@@ -14,6 +14,7 @@ struct ReleaseCreator {
       at: ".changes/releases/\(version.release)"
     )
     let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
     encoder.outputFormatting = .prettyPrinted
     let releaseInfo = ReleaseInfo(version: version.release, createdAtDate: Date())
     let outputString = try encoder.encode(releaseInfo)

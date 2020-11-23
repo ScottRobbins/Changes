@@ -3,7 +3,11 @@ import Foundation
 import Version
 
 struct ChangesQuerier {
-  private let decoder = JSONDecoder()
+  private let decoder: JSONDecoder = {
+    let _decoder = JSONDecoder()
+    _decoder.dateDecodingStrategy = .iso8601
+    return _decoder
+  }()
 
   func queryAllByRelease() throws -> ChangesQuerier.ReleaseAndUnreleasedEntries {
     let loadedConfig = try ConfigurationLoader().load()

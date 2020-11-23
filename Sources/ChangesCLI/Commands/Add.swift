@@ -109,6 +109,7 @@ struct Add: ParsableCommand {
       createdAtDate: date
     )
     let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
     encoder.outputFormatting = .prettyPrinted
     let outputString = try encoder.encode(entry)
 

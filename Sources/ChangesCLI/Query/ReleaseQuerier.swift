@@ -85,6 +85,7 @@ struct ReleaseQuerier {
   private func releaseInfo(for folder: Folder) throws -> ReleaseAndPrereleaseInfo {
     let releaseInfo = try folder.file(named: "info.json").read()
     let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
     let release = try decoder.decode(ReleaseInfo.self, from: releaseInfo)
 
     let prereleases: [ReleaseInfo] = try folder.createSubfolderIfNeeded(withName: "prereleases")
