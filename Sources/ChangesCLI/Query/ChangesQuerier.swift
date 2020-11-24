@@ -23,6 +23,112 @@ struct ChangesQuerier {
     )
   }
 
+  func queryAll() throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
+    let releaseQueryItems = changes.releaseEntries.flatMap { changesQueryItems(from: $0) }
+
+    return unreleasedQueryItems + releaseQueryItems
+  }
+
+  func query(
+    versions: [Version],
+    includeLatest: Bool,
+    includeUnreleased: Bool
+  ) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    let explicitChangesQueryItems = try explicitReleaseChangesQueryItems(
+      changes: changes.releaseEntries,
+      versions: versions
+    )
+
+    let latestChangesQueryItems: [ChangesQueryItem]
+    if includeLatest {
+      latestChangesQueryItems =
+        latestReleaseEntry(releaseEntries: changes.releaseEntries).map {
+          changesQueryItems(from: $0)
+        } ?? []
+    }
+    else {
+      latestChangesQueryItems = []
+    }
+
+    let unreleasedChangesQueryItems =
+      includeUnreleased ? changes.unreleasedEntries.map { changesQueryItem(from: $0) } : []
+
+    return unreleasedChangesQueryItems + latestChangesQueryItems + explicitChangesQueryItems
+  }
+
+  func query(versions versionRange: ClosedRange<Version>) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func query(versions versionRange: Range<Version>) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func query(versions versionRange: PartialRangeFrom<Version>) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func query(versions versionRange: PartialRangeUpTo<Version>) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func query(versions versionRange: PartialRangeThrough<Version>) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func queryUpToLatest() throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func queryUpToLatest(start startVersion: Version) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    return changes.releaseEntries.filter { (startVersion...).contains($0.version) }.flatMap {
+      changesQueryItems(from: $0)
+    }
+  }
+
+  func queryIncludingUnreleasedStartingAtLatest() throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
+    let releaseQueryItems =
+      latestReleaseEntry(releaseEntries: changes.releaseEntries).map { changesQueryItems(from: $0) }
+      ?? []
+
+    return unreleasedQueryItems + releaseQueryItems
+  }
+
+  func queryIncludingUnreleased(start startVersion: Version) throws -> [ChangesQueryItem] {
+    let changes = try queryAllByRelease()
+    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
+    let releaseQueryItems = changes.releaseEntries.filter { (startVersion...).contains($0.version) }
+      .flatMap {
+        changesQueryItems(from: $0)
+      }
+
+    return unreleasedQueryItems + releaseQueryItems
+  }
+
   private func releaseEntries(workingFolder: Folder) throws -> [ReleaseEntry] {
     let releaseFolders = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/releases"
@@ -76,6 +182,59 @@ struct ChangesQuerier {
     }.sorted {
       $0.createdAtDate < $1.createdAtDate
     }
+  }
+
+  private func changesQueryItem(
+    from entry: ChangelogEntry,
+    release: String? = nil,
+    prerelease: String? = nil
+  ) -> ChangesQueryItem {
+    ChangesQueryItem(
+      tags: entry.tags,
+      description: entry.description,
+      createdAtDate: entry.createdAtDate,
+      release: release,
+      prerelease: prerelease
+    )
+  }
+
+  private func explicitReleaseChangesQueryItems(
+    changes: [ReleaseEntry],
+    versions: [Version]
+  ) throws -> [ChangesQueryItem] {
+    try versions
+      .map { realVersion -> ReleaseEntry in
+        let _matchedRelease = changes.first { $0.version == realVersion }
+        guard let matchedRelease = _matchedRelease else {
+          throw ChangesError(#"Version "\#(realVersion)" was not found"#)
+        }
+
+        return matchedRelease
+      }.flatMap {
+        changesQueryItems(from: $0)
+      }
+  }
+
+  private func latestReleaseEntry(releaseEntries: [ReleaseEntry]) -> ReleaseEntry? {
+    releaseEntries.sorted { $0.version > $1.version }.first
+  }
+
+  private func changesQueryItems(from releaseEntry: ReleaseEntry) -> [ChangesQueryItem] {
+    let release = releaseEntry.version.description
+    let topLevelReleaseEntries = releaseEntry.entries.map {
+      changesQueryItem(from: $0, release: release)
+    }
+    let prereleaseEntries = releaseEntry.prereleases.flatMap { prereleaseEntry in
+      prereleaseEntry.entries.map {
+        changesQueryItem(
+          from: $0,
+          release: release,
+          prerelease: prereleaseEntry.version.description
+        )
+      }
+    }
+
+    return topLevelReleaseEntries + prereleaseEntries
   }
 }
 
