@@ -100,6 +100,7 @@ struct Releases: ParsableCommand {
 
     let response = ReleaseQueryResponse(releases: queriedReleases)
     let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
     let releasesJsonData = try encoder.encode(response)
     guard let responseJsonString = String(data: releasesJsonData, encoding: .utf8) else {
       throw ChangesError("Could not create json string from response.")

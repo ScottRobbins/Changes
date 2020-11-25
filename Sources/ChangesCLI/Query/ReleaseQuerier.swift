@@ -1,4 +1,3 @@
-import ArgumentParser
 import Files
 import Foundation
 import Version
@@ -86,6 +85,7 @@ struct ReleaseQuerier {
   private func releaseInfo(for folder: Folder) throws -> ReleaseAndPrereleaseInfo {
     let releaseInfo = try folder.file(named: "info.json").read()
     let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
     let release = try decoder.decode(ReleaseInfo.self, from: releaseInfo)
 
     let prereleases: [ReleaseInfo] = try folder.createSubfolderIfNeeded(withName: "prereleases")
@@ -108,7 +108,7 @@ struct ReleaseQuerier {
           $0.release.version == realVersion
         }
         guard let matchedRelease = _matchedRelease else {
-          throw ValidationError(#"Version "\#(realVersion)" was not found"#)
+          throw ChangesError(#"Version "\#(realVersion)" was not found"#)
         }
 
         return matchedRelease

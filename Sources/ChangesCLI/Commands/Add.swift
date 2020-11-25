@@ -37,7 +37,7 @@ struct Add: ParsableCommand {
   func validate() throws {
     let loadedConfig = try ConfigurationLoader().load()
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
-      throw ChangesError("Could not find folder of changes config.")
+      throw ValidationError("Could not find folder of changes config.")
     }
 
     for tag in tags {
@@ -71,7 +71,7 @@ struct Add: ParsableCommand {
   func run() throws {
     let loadedConfig = try ConfigurationLoader().load()
     guard let workingFolder = try File(path: loadedConfig.path).parent else {
-      throw ChangesError("Could not find folder of changes config.")
+      throw ValidationError("Could not find folder of changes config.")
     }
 
     let tags: [String]
@@ -109,6 +109,7 @@ struct Add: ParsableCommand {
       createdAtDate: date
     )
     let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
     encoder.outputFormatting = .prettyPrinted
     let outputString = try encoder.encode(entry)
 

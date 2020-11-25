@@ -121,4 +121,15 @@ Examples of querying for releases:
 $ changes releases 1.0.0 1.1.0 latest
 $ changes releases --start 1.0.0 --end 1.1.0
 $ changes releases --start 1.1.0
+$ changes releases --end 1.1.0
+```
+
+Examples of querying for change entries:
+
+```bash
+$ changes entries --releases 1.0.0 1.1.0 latest
+$ changes entries --start 1.0.0 --end 1.1.0
+$ changes entries --start 1.1.0
+$ changes entries --end 1.1.0
+$ changes entries --tags Added Changed
 ```

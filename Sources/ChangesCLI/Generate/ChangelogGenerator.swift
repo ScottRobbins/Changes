@@ -39,7 +39,7 @@ struct ChangelogGenerator {
       throw ChangesError("Could not find folder of changes config.")
     }
 
-    let entries = try ChangesFetcher().fetch()
+    let entries = try ChangesQuerier().queryAllByRelease()
     for file in files {
       try writeToChangelog(
         unreleasedEntries: entries.unreleasedEntries.sorted { $0.createdAtDate < $1.createdAtDate },
@@ -52,7 +52,7 @@ struct ChangelogGenerator {
 
   private func writeToChangelog(
     unreleasedEntries: [ChangelogEntry],
-    releaseEntries: [ChangesFetcher.ReleaseEntry],
+    releaseEntries: [ChangesQuerier.ReleaseEntry],
     file: ChangesConfig.ChangelogFile,
     workingFolder: Folder
   ) throws {
