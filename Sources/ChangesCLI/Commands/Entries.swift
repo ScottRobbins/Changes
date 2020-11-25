@@ -17,10 +17,10 @@ struct Entries: ParsableCommand {
   @Option(
     name: .shortAndLong,
     help: .init(
-      "Specify the versions to query for."
+      "Specify the releases to query for."
     )
   )
-  var versions: [String] = []
+  var releases: [String] = []
 
   @Option(
     name: .shortAndLong,
@@ -38,14 +38,23 @@ struct Entries: ParsableCommand {
   )
   var end: String?
 
+  @Option(
+    name: .shortAndLong,
+    parsing: .upToNextOption,
+    help: .init(
+      "Specify one or more tags to query for."
+    )
+  )
+  var tags: [String] = []
+
   func validate() throws {
-    for version in versions {
-      guard version == "latest" || version == "unreleased" || Version.valid(string: version) else {
-        throw ValidationError(#""\#(version)" is not a valid version"#)
+    for release in releases {
+      guard release == "latest" || release == "unreleased" || Version.valid(string: release) else {
+        throw ValidationError(#""\#(release)" is not a valid version"#)
       }
 
       guard
-        version == "latest" || version == "unreleased" || (try! Version(version)).prerelease == nil
+        release == "latest" || release == "unreleased" || (try! Version(release)).prerelease == nil
       else {
         throw ValidationError("Cannot specify prerelease version")
       }
@@ -71,55 +80,61 @@ struct Entries: ParsableCommand {
       }
     }
 
-    guard versions.isEmpty || (start == nil && end == nil) else {
+    guard releases.isEmpty || (start == nil && end == nil) else {
       throw ValidationError("Cannot specify specific versions along with a version range")
     }
   }
 
   func run() throws {
+    let tags = self.tags.isEmpty ? nil : Set(self.tags)
     let changesQuerier = ChangesQuerier()
     let queriedChanges: [ChangesQueryItem]
-    if !versions.isEmpty {
-      let explicitVersions = try versions.filter { $0 != "latest" && $0 != "unreleased" }.map {
+    if !releases.isEmpty {
+      let explicitVersions = try releases.filter { $0 != "latest" && $0 != "unreleased" }.map {
         try Version($0)
       }
-      let includeLatest = versions.contains("latest")
-      let includeUnreleased = versions.contains("unreleased")
+      let includeLatest = releases.contains("latest")
+      let includeUnreleased = releases.contains("unreleased")
       queriedChanges = try changesQuerier.query(
         versions: explicitVersions,
         includeLatest: includeLatest,
-        includeUnreleased: includeUnreleased
+        includeUnreleased: includeUnreleased,
+        tags: tags
       )
     }
     else if let start = start, let end = end {
       let startVersion = try Version(start)
       if end == "latest" {
-        queriedChanges = try changesQuerier.queryUpToLatest(start: startVersion)
+        queriedChanges = try changesQuerier.queryUpToLatest(start: startVersion, tags: tags)
       }
       else {
         let endVersion = try Version(end)
-        queriedChanges = try changesQuerier.query(versions: startVersion...endVersion)
+        queriedChanges = try changesQuerier.query(versions: startVersion...endVersion, tags: tags)
       }
     }
     else if let start = start {
       if start == "latest" {
-        queriedChanges = try changesQuerier.queryIncludingUnreleasedStartingAtLatest()
-      } else {
+        queriedChanges = try changesQuerier.queryIncludingUnreleasedStartingAtLatest(tags: tags)
+      }
+      else {
         let startVersion = try Version(start)
-        queriedChanges = try changesQuerier.queryIncludingUnreleased(start: startVersion)
+        queriedChanges = try changesQuerier.queryIncludingUnreleased(
+          start: startVersion,
+          tags: tags
+        )
       }
     }
     else if let end = end {
       if end == "latest" {
-        queriedChanges = try changesQuerier.queryUpToLatest()
+        queriedChanges = try changesQuerier.queryUpToLatest(tags: tags)
       }
       else {
         let endVersion = try Version(end)
-        queriedChanges = try changesQuerier.query(versions: ...endVersion)
+        queriedChanges = try changesQuerier.query(versions: ...endVersion, tags: tags)
       }
     }
     else {
-      queriedChanges = try changesQuerier.queryAll()
+      queriedChanges = try changesQuerier.queryAll(tags: tags)
     }
 
     let response = EntriesQueryResponse(entries: queriedChanges)

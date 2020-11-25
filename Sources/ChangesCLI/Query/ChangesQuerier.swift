@@ -23,10 +23,15 @@ struct ChangesQuerier {
     )
   }
 
-  func queryAll() throws -> [ChangesQueryItem] {
+  func queryAll(tags: Set<String>?) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
-    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
-    let releaseQueryItems = changes.releaseEntries.flatMap { changesQueryItems(from: $0) }
+    let unreleasedQueryItems = changesQueryItems(
+      fromUnreleasedEntries: changes.unreleasedEntries,
+      tags: tags
+    )
+    let releaseQueryItems = changes.releaseEntries.flatMap {
+      changesQueryItems(from: $0, tags: tags)
+    }
 
     return unreleasedQueryItems + releaseQueryItems
   }
@@ -34,19 +39,21 @@ struct ChangesQuerier {
   func query(
     versions: [Version],
     includeLatest: Bool,
-    includeUnreleased: Bool
+    includeUnreleased: Bool,
+    tags: Set<String>?
   ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     let explicitChangesQueryItems = try explicitReleaseChangesQueryItems(
       changes: changes.releaseEntries,
-      versions: versions
+      versions: versions,
+      tags: tags
     )
 
     let latestChangesQueryItems: [ChangesQueryItem]
     if includeLatest {
       latestChangesQueryItems =
         latestReleaseEntry(releaseEntries: changes.releaseEntries).map {
-          changesQueryItems(from: $0)
+          changesQueryItems(from: $0, tags: tags)
         } ?? []
     }
     else {
@@ -54,76 +61,102 @@ struct ChangesQuerier {
     }
 
     let unreleasedChangesQueryItems =
-      includeUnreleased ? changes.unreleasedEntries.map { changesQueryItem(from: $0) } : []
+      includeUnreleased
+      ? changesQueryItems(fromUnreleasedEntries: changes.unreleasedEntries, tags: tags) : []
 
     return unreleasedChangesQueryItems + latestChangesQueryItems + explicitChangesQueryItems
   }
 
-  func query(versions versionRange: ClosedRange<Version>) throws -> [ChangesQueryItem] {
+  func query(
+    versions versionRange: ClosedRange<Version>,
+    tags: Set<String>?
+  ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func query(versions versionRange: Range<Version>) throws -> [ChangesQueryItem] {
+  func query(versions versionRange: Range<Version>, tags: Set<String>?) throws -> [ChangesQueryItem]
+  {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func query(versions versionRange: PartialRangeFrom<Version>) throws -> [ChangesQueryItem] {
+  func query(
+    versions versionRange: PartialRangeFrom<Version>,
+    tags: Set<String>?
+  ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func query(versions versionRange: PartialRangeUpTo<Version>) throws -> [ChangesQueryItem] {
+  func query(
+    versions versionRange: PartialRangeUpTo<Version>,
+    tags: Set<String>?
+  ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func query(versions versionRange: PartialRangeThrough<Version>) throws -> [ChangesQueryItem] {
+  func query(
+    versions versionRange: PartialRangeThrough<Version>,
+    tags: Set<String>?
+  ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { versionRange.contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func queryUpToLatest() throws -> [ChangesQueryItem] {
+  func queryUpToLatest(tags: Set<String>?) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func queryUpToLatest(start startVersion: Version) throws -> [ChangesQueryItem] {
+  func queryUpToLatest(start startVersion: Version, tags: Set<String>?) throws -> [ChangesQueryItem]
+  {
     let changes = try queryAllByRelease()
     return changes.releaseEntries.filter { (startVersion...).contains($0.version) }.flatMap {
-      changesQueryItems(from: $0)
+      changesQueryItems(from: $0, tags: tags)
     }
   }
 
-  func queryIncludingUnreleasedStartingAtLatest() throws -> [ChangesQueryItem] {
+  func queryIncludingUnreleasedStartingAtLatest(tags: Set<String>?) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
-    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
+    let unreleasedQueryItems = changesQueryItems(
+      fromUnreleasedEntries: changes.unreleasedEntries,
+      tags: tags
+    )
     let releaseQueryItems =
-      latestReleaseEntry(releaseEntries: changes.releaseEntries).map { changesQueryItems(from: $0) }
+      latestReleaseEntry(releaseEntries: changes.releaseEntries).map {
+        changesQueryItems(from: $0, tags: tags)
+      }
       ?? []
 
     return unreleasedQueryItems + releaseQueryItems
   }
 
-  func queryIncludingUnreleased(start startVersion: Version) throws -> [ChangesQueryItem] {
+  func queryIncludingUnreleased(
+    start startVersion: Version,
+    tags: Set<String>?
+  ) throws -> [ChangesQueryItem] {
     let changes = try queryAllByRelease()
-    let unreleasedQueryItems = changes.unreleasedEntries.map { changesQueryItem(from: $0) }
+    let unreleasedQueryItems = changesQueryItems(
+      fromUnreleasedEntries: changes.unreleasedEntries,
+      tags: tags
+    )
     let releaseQueryItems = changes.releaseEntries.filter { (startVersion...).contains($0.version) }
       .flatMap {
-        changesQueryItems(from: $0)
+        changesQueryItems(from: $0, tags: tags)
       }
 
     return unreleasedQueryItems + releaseQueryItems
@@ -200,7 +233,8 @@ struct ChangesQuerier {
 
   private func explicitReleaseChangesQueryItems(
     changes: [ReleaseEntry],
-    versions: [Version]
+    versions: [Version],
+    tags: Set<String>?
   ) throws -> [ChangesQueryItem] {
     try versions
       .map { realVersion -> ReleaseEntry in
@@ -211,7 +245,7 @@ struct ChangesQuerier {
 
         return matchedRelease
       }.flatMap {
-        changesQueryItems(from: $0)
+        changesQueryItems(from: $0, tags: tags)
       }
   }
 
@@ -219,7 +253,25 @@ struct ChangesQuerier {
     releaseEntries.sorted { $0.version > $1.version }.first
   }
 
-  private func changesQueryItems(from releaseEntry: ReleaseEntry) -> [ChangesQueryItem] {
+  private func changesQueryItems(
+    fromUnreleasedEntries unreleasedEntries: [ChangelogEntry],
+    tags: Set<String>?
+  ) -> [ChangesQueryItem] {
+    let validTagEntries: [ChangelogEntry]
+    if let tags = tags {
+      validTagEntries = unreleasedEntries.filter { !tags.isDisjoint(with: $0.tags) }
+    }
+    else {
+      validTagEntries = unreleasedEntries
+    }
+
+    return validTagEntries.map { changesQueryItem(from: $0) }
+  }
+
+  private func changesQueryItems(
+    from releaseEntry: ReleaseEntry,
+    tags: Set<String>?
+  ) -> [ChangesQueryItem] {
     let release = releaseEntry.version.description
     let topLevelReleaseEntries = releaseEntry.entries.map {
       changesQueryItem(from: $0, release: release)
@@ -234,7 +286,13 @@ struct ChangesQuerier {
       }
     }
 
-    return topLevelReleaseEntries + prereleaseEntries
+    let allEntries = topLevelReleaseEntries + prereleaseEntries
+    if let tags = tags {
+      return allEntries.filter { !tags.isDisjoint(with: $0.tags) }
+    }
+    else {
+      return allEntries
+    }
   }
 }
 
