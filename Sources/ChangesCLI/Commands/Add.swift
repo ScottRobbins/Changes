@@ -113,23 +113,7 @@ struct Add: ParsableCommand {
     encoder.outputFormatting = .prettyPrinted
     let outputString = try encoder.encode(entry)
 
-    let dateFormatter = ISO8601DateFormatter()
-    dateFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
-    let dateString = dateFormatter.string(from: date)
-    let descriptionString =
-      description
-      .lowercased()
-      .components(separatedBy: .whitespacesAndNewlines)
-      .map {
-        $0.components(
-          separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-")).inverted
-        )
-        .joined()
-      }
-      .prefix(8)
-      .joined(separator: "-")
-    let suffix = UUID().uuidString.suffix(10)
-    try outputFolder.createFile(named: "\(dateString)-\(descriptionString)-\(suffix).json").write(
+    try outputFolder.createFile(named: "\(UUID().uuidString).json").write(
       outputString
     )
     try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
