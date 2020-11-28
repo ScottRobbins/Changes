@@ -210,8 +210,10 @@ struct ChangesQuerier {
 
   private func changelogEntries(releaseFolder: Folder) throws -> [Entry] {
     return try releaseFolder.createSubfolderIfNeeded(withName: "entries").files.map { file in
-      let file = try file.read()
-      return try decoder.decode(Entry.self, from: file)
+      let fileData = try file.read()
+      return try decoder.decode(EntryFile.self, from: fileData).entry(
+        id: file.nameExcludingExtension
+      )
     }.sorted {
       $0.createdAtDate < $1.createdAtDate
     }
@@ -223,6 +225,7 @@ struct ChangesQuerier {
     prerelease: String? = nil
   ) -> ChangesQueryItem {
     ChangesQueryItem(
+      id: entry.id,
       tags: entry.tags,
       description: entry.description,
       createdAtDate: entry.createdAtDate,

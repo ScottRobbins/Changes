@@ -103,7 +103,7 @@ struct Add: ParsableCommand {
     }
 
     let date = Date()
-    let entry = Entry(
+    let entry = EntryFile(
       tags: tags,
       description: description,
       createdAtDate: date

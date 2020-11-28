@@ -1,6 +1,7 @@
 import Foundation
 
 struct ChangesQueryItem: Codable {
+  let id: String
   let tags: [String]
   let description: String
   let createdAtDate: Date
