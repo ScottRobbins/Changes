@@ -99,7 +99,7 @@ struct Add: ParsableCommand {
       }
     }
     else {
-      outputFolder = try workingFolder.subfolder(named: ".changes/unreleased/entries")
+      outputFolder = try workingFolder.createSubfolderIfNeeded(at: ".changes/unreleased/entries")
     }
 
     let date = Date()
