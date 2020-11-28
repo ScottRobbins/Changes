@@ -1,0 +1,7 @@
+{
+  "createdAtDate" : "2020-11-28T03:37:15Z",
+  "tags" : [
+    "Changed"
+  ],
+  "description" : "Do not include version in release info json"
+}
