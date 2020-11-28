@@ -27,23 +27,23 @@ jobs:
     strategy: 
       matrix:
         image:
-          # 5.3 Stable
-          - swift:5.3-xenial
-          - swift:5.3-bionic
-          - swift:5.3-focal
-          - swift:5.3-centos8
-          - swift:5.3-amazonlinux2
+          # 5.3.1 Stable
+          - swift:5.3.1-xenial
+          - swift:5.3.1-bionic
+          - swift:5.3.1-focal
+          - swift:5.3.1-centos8
+          - swift:5.3.1-amazonlinux2
         include:
-          - image: swift:5.3-xenial
-            IMAGE_IDENTIFIER: swift-5-3-xenial
-          - image: swift:5.3-bionic
-            IMAGE_IDENTIFIER: swift-5-3-bionic
-          - image: swift:5.3-focal
-            IMAGE_IDENTIFIER: swift-5-3-focal
-          - image: swift:5.3-centos8
-            IMAGE_IDENTIFIER: swift-5-3-centos8
-          - image: swift:5.3-amazonlinux2
-            IMAGE_IDENTIFIER: swift-5-3-amazonlinux2
+          - image: swift:5.3.1-xenial
+            IMAGE_IDENTIFIER: swift-5-3-1-xenial
+          - image: swift:5.3.1-bionic
+            IMAGE_IDENTIFIER: swift-5-3-1-bionic
+          - image: swift:5.3.1-focal
+            IMAGE_IDENTIFIER: swift-5-3-1-focal
+          - image: swift:5.3.1-centos8
+            IMAGE_IDENTIFIER: swift-5-3-1-centos8
+          - image: swift:5.3.1-amazonlinux2
+            IMAGE_IDENTIFIER: swift-5-3-1-amazonlinux2
     container: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v2
