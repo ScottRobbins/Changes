@@ -47,19 +47,35 @@ jobs:
     container: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Build Dynamic
         run: swift build -c release
-      - name: Package
+      - name: Package Dynamic
         run: tar -C .build/release -cvzf changes.tar.gz changes
-      - name: Upload Build Asset
-        id: upload-release-asset
+      - name: Upload Dynamic Build Asset
+        id: upload-dynamic-release-asset
         uses: actions/upload-release-asset@v1
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: changes.tar.gz
-          asset_name: changes-${{ matrix.IMAGE_IDENTIFIER }}.tar.gz
+          asset_name: changes-${{ matrix.IMAGE_IDENTIFIER }}-dynamic.tar.gz
+          asset_content_type: application/gzip
+      - name: Clear cache
+        run: rm -rf .build
+      - name: Build Static
+        run: swift build -c release -Xswiftc -static-executable
+      - name: Package Static
+        run: tar -C .build/release -cvzf changes.tar.gz changes
+      - name: Upload Static Build Asset
+        id: upload-static-release-asset
+        uses: actions/upload-release-asset@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: changes.tar.gz
+          asset_name: changes-${{ matrix.IMAGE_IDENTIFIER }}-static.tar.gz
           asset_content_type: application/gzip
   macOS:
     runs-on: macos-latest
@@ -82,7 +98,7 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: changes.tar.gz
-          asset_name: changes-swift-5-3-macOS.tar.gz
+          asset_name: changes-swift-5-3-macOS-dynamic.tar.gz
           asset_content_type: application/gzip
 
 
