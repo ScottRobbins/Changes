@@ -196,7 +196,7 @@ struct ChangesQuerier {
     }
   }
 
-  private func unreleasedEntries(workingFolder: Folder) throws -> [ChangelogEntry] {
+  private func unreleasedEntries(workingFolder: Folder) throws -> [Entry] {
     let unreleasedFolder = try workingFolder.createSubfolderIfNeeded(
       at: ".changes/unreleased"
     )
@@ -208,17 +208,17 @@ struct ChangesQuerier {
     return try decoder.decode(ReleaseInfo.self, from: releaseInfo)
   }
 
-  private func changelogEntries(releaseFolder: Folder) throws -> [ChangelogEntry] {
+  private func changelogEntries(releaseFolder: Folder) throws -> [Entry] {
     return try releaseFolder.createSubfolderIfNeeded(withName: "entries").files.map { file in
       let file = try file.read()
-      return try decoder.decode(ChangelogEntry.self, from: file)
+      return try decoder.decode(Entry.self, from: file)
     }.sorted {
       $0.createdAtDate < $1.createdAtDate
     }
   }
 
   private func changesQueryItem(
-    from entry: ChangelogEntry,
+    from entry: Entry,
     release: String? = nil,
     prerelease: String? = nil
   ) -> ChangesQueryItem {
@@ -254,10 +254,10 @@ struct ChangesQuerier {
   }
 
   private func changesQueryItems(
-    fromUnreleasedEntries unreleasedEntries: [ChangelogEntry],
+    fromUnreleasedEntries unreleasedEntries: [Entry],
     tags: Set<String>?
   ) -> [ChangesQueryItem] {
-    let validTagEntries: [ChangelogEntry]
+    let validTagEntries: [Entry]
     if let tags = tags {
       validTagEntries = unreleasedEntries.filter { !tags.isDisjoint(with: $0.tags) }
     }
@@ -298,14 +298,14 @@ struct ChangesQuerier {
 
 extension ChangesQuerier {
   struct ReleaseAndUnreleasedEntries {
-    let unreleasedEntries: [ChangelogEntry]
+    let unreleasedEntries: [Entry]
     let releaseEntries: [ReleaseEntry]
   }
 
   struct ReleaseEntry {
     let version: Version
     let createdAtDate: Date
-    let entries: [ChangelogEntry]
+    let entries: [Entry]
     let prereleases: [PrereleaseEntry]
   }
 
@@ -313,6 +313,6 @@ extension ChangesQuerier {
   struct PrereleaseEntry {
     let version: Version
     let createdAtDate: Date
-    let entries: [ChangelogEntry]
+    let entries: [Entry]
   }
 }

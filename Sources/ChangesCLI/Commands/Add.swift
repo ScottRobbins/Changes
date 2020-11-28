@@ -103,7 +103,7 @@ struct Add: ParsableCommand {
     }
 
     let date = Date()
-    let entry = ChangelogEntry(
+    let entry = Entry(
       tags: tags,
       description: description,
       createdAtDate: date

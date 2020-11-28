@@ -1,6 +1,6 @@
 import Foundation
 
-struct ChangelogEntry: Codable {
+struct Entry: Codable {
   let tags: [String]
   let description: String
   let createdAtDate: Date

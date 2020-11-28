@@ -51,7 +51,7 @@ struct ChangelogGenerator {
   }
 
   private func writeToChangelog(
-    unreleasedEntries: [ChangelogEntry],
+    unreleasedEntries: [Entry],
     releaseEntries: [ChangesQuerier.ReleaseEntry],
     file: ChangesConfig.ChangelogFile,
     workingFolder: Folder
@@ -104,7 +104,7 @@ struct ChangelogGenerator {
   private func sectionString(
     name: String,
     date: Date? = nil,
-    entries: [ChangelogEntry],
+    entries: [Entry],
     file: ChangesConfig.ChangelogFile
   ) -> String {
     let sectionNameString: String
