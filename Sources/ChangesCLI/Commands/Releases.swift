@@ -83,18 +83,22 @@ struct Releases: ParsableCommand {
         versions: explicitVersions,
         includeLatest: includeLatest
       )
-    } else if let start = start, let end = end {
+    }
+    else if let start = start, let end = end {
       let startVersion = try Version(start)
       let endVersion = try Version(end)
 
       queriedReleases = try releaseQuerier.query(versions: startVersion...endVersion)
-    } else if let start = start {
+    }
+    else if let start = start {
       let startVersion = try Version(start)
       queriedReleases = try releaseQuerier.query(versions: startVersion...)
-    } else if let end = end {
+    }
+    else if let end = end {
       let endVersion = try Version(end)
       queriedReleases = try releaseQuerier.query(versions: ...endVersion)
-    } else {
+    }
+    else {
       queriedReleases = try releaseQuerier.queryAll()
     }
 
