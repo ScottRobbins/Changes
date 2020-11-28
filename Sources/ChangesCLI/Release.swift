@@ -1,7 +1,7 @@
 import Foundation
 import Version
 
-struct ReleaseInfo: Codable {
+struct Release: Codable {
   let version: Version
   let createdAtDate: Date
 

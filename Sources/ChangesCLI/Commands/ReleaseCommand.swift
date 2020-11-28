@@ -1,7 +1,7 @@
 import ArgumentParser
 import Version
 
-struct Release: ParsableCommand {
+struct ReleaseCommand: ParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "release",
     abstract: "Create a release."

@@ -16,7 +16,7 @@ struct ReleaseCreator {
     let encoder = JSONEncoder()
     encoder.dateEncodingStrategy = .iso8601
     encoder.outputFormatting = .prettyPrinted
-    let releaseInfo = ReleaseInfo(version: version.release, createdAtDate: Date())
+    let releaseInfo = Release(version: version.release, createdAtDate: Date())
     let outputString = try encoder.encode(releaseInfo)
     try releaseFolder.createFileIfNeeded(at: "info.json").write(outputString)
 
@@ -33,7 +33,7 @@ struct ReleaseCreator {
       let preReleaseFolder = try releaseFolder.createSubfolderIfNeeded(
         at: "prereleases/\(version.droppingBuildMetadata.description)"
       )
-      let preReleaseInfo = ReleaseInfo(
+      let preReleaseInfo = Release(
         version: version.droppingBuildMetadata,
         createdAtDate: Date()
       )
