@@ -3,8 +3,8 @@ import Foundation
 import Version
 
 private struct ReleaseAndPrereleaseInfo {
-  let release: ReleaseInfo
-  let prereleases: [ReleaseInfo]
+  let release: Release
+  let prereleases: [Release]
 }
 
 struct ReleaseQuerier {
@@ -86,13 +86,17 @@ struct ReleaseQuerier {
     let releaseInfo = try folder.file(named: "info.json").read()
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
-    let release = try decoder.decode(ReleaseInfo.self, from: releaseInfo)
+    let release = try decoder.decode(ReleaseFile.self, from: releaseInfo).release(
+      version: Version(folder.name)
+    )
 
-    let prereleases: [ReleaseInfo] = try folder.createSubfolderIfNeeded(withName: "prereleases")
+    let prereleases: [Release] = try folder.createSubfolderIfNeeded(withName: "prereleases")
       .subfolders
       .map {
         let prereleaseInfo = try $0.file(named: "info.json").read()
-        return try decoder.decode(ReleaseInfo.self, from: prereleaseInfo)
+        return try decoder.decode(ReleaseFile.self, from: prereleaseInfo).release(
+          version: Version($0.name)
+        )
       }
 
     return ReleaseAndPrereleaseInfo(release: release, prereleases: prereleases)

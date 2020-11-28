@@ -6,7 +6,7 @@ struct Changes: ParsableCommand {
     abstract: "A utility and framework for managing and generating changelogs",
     version: "0.1.0",
     subcommands: [
-      Init.self, Add.self, Regenerate.self, Release.self, Releases.self, Entries.self,
+      Init.self, Add.self, Regenerate.self, ReleaseCommand.self, Releases.self, Entries.self,
     ]
   )
 }
