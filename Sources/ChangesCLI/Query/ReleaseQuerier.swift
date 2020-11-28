@@ -86,13 +86,17 @@ struct ReleaseQuerier {
     let releaseInfo = try folder.file(named: "info.json").read()
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
-    let release = try decoder.decode(Release.self, from: releaseInfo)
+    let release = try decoder.decode(ReleaseFile.self, from: releaseInfo).release(
+      version: Version(folder.name)
+    )
 
     let prereleases: [Release] = try folder.createSubfolderIfNeeded(withName: "prereleases")
       .subfolders
       .map {
         let prereleaseInfo = try $0.file(named: "info.json").read()
-        return try decoder.decode(Release.self, from: prereleaseInfo)
+        return try decoder.decode(ReleaseFile.self, from: prereleaseInfo).release(
+          version: Version($0.name)
+        )
       }
 
     return ReleaseAndPrereleaseInfo(release: release, prereleases: prereleases)

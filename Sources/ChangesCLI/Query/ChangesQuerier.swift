@@ -205,7 +205,9 @@ struct ChangesQuerier {
 
   private func getReleaseInfo(for folder: Folder) throws -> Release {
     let releaseInfo = try folder.file(named: "info.json").read()
-    return try decoder.decode(Release.self, from: releaseInfo)
+    return try decoder.decode(ReleaseFile.self, from: releaseInfo).release(
+      version: Version(folder.name)
+    )
   }
 
   private func changelogEntries(releaseFolder: Folder) throws -> [Entry] {
