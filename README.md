@@ -41,7 +41,7 @@ $ brew install swiftbuildtools/formulae/changes
 
 Add this to your package.swift file
 ```swift
-.package(url: "https://github.com/SwiftBuildTools/Changes.git", .exact("0.1.0"))
+.package(url: "https://github.com/SwiftBuildTools/Changes.git", .exact("0.2.0"))
 ```
 
 ##### Install pre-built binaries
