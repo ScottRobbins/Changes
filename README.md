@@ -27,7 +27,7 @@ There are 2 main reasons:
 
 ### Installation
 
-The first thing you'll need to do is [install Swift](https://swift.org/download/#using-downloads).
+The first thing you'll need to do is [install Swift](https://swift.org/download/#using-downloads). You can skip this step if you are using a static executable.
 
 After that is complete, install the binary via one of these methods:
 
