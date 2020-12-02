@@ -25,7 +25,6 @@ struct Init: ParsableCommand {
           identifier: "changelog",
           path: "./CHANGELOG.md",
           tags: tags,
-          automaticallyRegenerate: true,
           footerText: nil
         )
       ]

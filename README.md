@@ -1,6 +1,6 @@
 # Changes
 
-Changes is CLI tool (and in the future a framework) for creating Changelog entries and generating Changelogs and other documents from those.  
+Changes is CLI tool (and in the future a framework) for tracking metadata around changes made to code, generating Changelogs and other documents from those entries.  
 
 **Note:** This is still in early development. API is subject to breakage between minor versions below 1.0.0
 
@@ -52,19 +52,19 @@ supports (if any are missing please open an issue).
 1. Download the needed binary
 
 ```bash
-$ curl -OL https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-2-<target>.tar.gz
+$ curl -OL https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-3-1-<target>-<dynamic|static>.tar.gz
 ```
 
 Or
 
 ```bash
-$ wget https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-2-<target>.tar.gz
+$ wget https://github.com/SwiftBuildTools/Changes/releases/download/<version>/changes-swift-5-3-1-<target>-<dynamic|static>.tar.gz
 ```
 
 2. Unpackage the binary
 
 ```bash
-$ tar -xvzf changes-swift-5-2-<target>.tar.gz 
+$ tar -xvzf changes-swift-5-2-<target>-<dynamic|static>.tar.gz 
 ```
 
 Put this executable somewhere in your PATH.

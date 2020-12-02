@@ -116,7 +116,6 @@ struct Add: ParsableCommand {
     try outputFolder.createFile(named: "\(UUID().uuidString).json").write(
       outputString
     )
-    try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
   }
 
   private func getTags(with config: ChangesConfig) -> [String] {
