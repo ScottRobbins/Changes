@@ -24,13 +24,6 @@ struct ChangelogGenerator {
     try regenerateFiles(files, loadedConfig: loadedConfig)
   }
 
-  func regenerateAutomaticallyRegeneratableFiles() throws {
-    let loadedConfig = try ConfigurationLoader().load()
-
-    let files = loadedConfig.config.files.filter(\.automaticallyRegenerate)
-    try regenerateFiles(files, loadedConfig: loadedConfig)
-  }
-
   private func regenerateFiles(
     _ files: [ChangesConfig.ChangelogFile],
     loadedConfig: LoadedChangesConfig

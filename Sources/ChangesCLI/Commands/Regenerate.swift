@@ -12,7 +12,7 @@ struct Regenerate: ParsableCommand {
       "Specify the files you would like to regenerate."
     )
   )
-  var identifiers: [String] = []
+  var identifiers: [String]
 
   func validate() throws {
     let loadedConfig = try ConfigurationLoader().load()
@@ -26,11 +26,6 @@ struct Regenerate: ParsableCommand {
   }
 
   func run() throws {
-    if identifiers.isEmpty {
-      try ChangelogGenerator().regenerateAutomaticallyRegeneratableFiles()
-    }
-    else {
-      try ChangelogGenerator().regenerateFiles(identifiers: identifiers)
-    }
+    try ChangelogGenerator().regenerateFiles(identifiers: identifiers)
   }
 }
