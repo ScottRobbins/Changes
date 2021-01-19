@@ -9,6 +9,7 @@ let package = Package(
     .macOS(.v10_15)
   ],
   products: [
+    .library(name: "Changes", targets: ["Changes"]),
     .executable(name: "changes", targets: ["ChangesCLI"])
   ],
   dependencies: [
@@ -19,6 +20,14 @@ let package = Package(
   ],
   targets: [
     .target(
+      name: "Changes",
+      dependencies: [
+        "Files",
+        "Version",
+        "Yams",
+      ]
+    ),
+    .target(
       name: "ChangesCLI",
       dependencies: [
         "Files",
@@ -28,8 +37,8 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "ChangesCLITests",
-      dependencies: ["ChangesCLI"]
+      name: "ChangesTests",
+      dependencies: ["Changes"]
     ),
   ]
 )
