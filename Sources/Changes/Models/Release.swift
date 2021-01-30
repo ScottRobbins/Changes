@@ -1,7 +1,7 @@
 import Foundation
 import Version
 
-struct Release {
-  let version: Version
-  let createdAtDate: Date
+public struct Release {
+  public let version: Version
+  public let createdAtDate: Date
 }
