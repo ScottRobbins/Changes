@@ -104,8 +104,7 @@ struct ChangelogGenerator {
     if let date = date {
       let dateString = dateFormatter.string(from: date)
       sectionNameString = "## [\(name)] - \(dateString)"
-    }
-    else {
+    } else {
       sectionNameString = "## [\(name)]"
     }
     if entries.isEmpty {
@@ -118,8 +117,7 @@ struct ChangelogGenerator {
         let index2 = file.tags.firstIndex(of: $1)
       {
         return index1 < index2
-      }
-      else {
+      } else {
         return false
       }
     }

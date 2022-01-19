@@ -44,8 +44,7 @@ struct ConcurrentAccumulation {
       DispatchQueue.global(qos: .userInitiated).async(group: group) {
         do {
           try closure(item, accumulationContainer)
-        }
-        catch let e {
+        } catch let e {
           queue.sync {
             error = e
           }

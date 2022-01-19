@@ -55,8 +55,7 @@ struct Add: ParsableCommand {
         else {
           throw ValidationError("Release \(release.droppingBuildMetadata) was not found.")
         }
-      }
-      else {
+      } else {
         guard
           let _ = try? workingFolder.subfolder(
             at: ".changes/releases/\(release.release)"
@@ -77,8 +76,7 @@ struct Add: ParsableCommand {
     let tags: [String]
     if self.tags.isEmpty {
       tags = getTags(with: loadedConfig.config)
-    }
-    else {
+    } else {
       tags = self.tags.compactMap { definedTag(matching: $0, with: loadedConfig.config) }
     }
 
@@ -91,14 +89,12 @@ struct Add: ParsableCommand {
           at:
             ".changes/releases/\(release.release)/prereleases/\(release.droppingBuildMetadata)/entries"
         )
-      }
-      else {
+      } else {
         outputFolder = try workingFolder.createSubfolderIfNeeded(
           at: ".changes/releases/\(release.release)/entries"
         )
       }
-    }
-    else {
+    } else {
       outputFolder = try workingFolder.createSubfolderIfNeeded(at: ".changes/unreleased/entries")
     }
 
@@ -137,8 +133,7 @@ struct Add: ParsableCommand {
     while true {
       if enteredTags.isEmpty {
         print("Enter a tag:", terminator: " ")
-      }
-      else {
+      } else {
         print("Enter another tag (Press enter if done):", terminator: " ")
       }
 
@@ -146,22 +141,17 @@ struct Add: ParsableCommand {
 
       if readTag.isEmpty && !enteredTags.isEmpty {
         return enteredTags
-      }
-      else if let number = Int(argument: readTag) {
+      } else if let number = Int(argument: readTag) {
         if let tag = allTags.element(atIndex: number) {
           enteredTags.append(tag)
-        }
-        else {
+        } else {
           print("\(number) is not a valid entry.")
         }
-      }
-      else if readTag.isEmpty {
+      } else if readTag.isEmpty {
         print("Please enter a tag.")
-      }
-      else if let tag = definedTag(matching: readTag, with: config) {
+      } else if let tag = definedTag(matching: readTag, with: config) {
         enteredTags.append(tag)
-      }
-      else {
+      } else {
         print("\(readTag) is not a valid tag")
       }
     }
@@ -175,8 +165,7 @@ struct Add: ParsableCommand {
       )
       if description.isEmpty {
         print("Please enter a description.")
-      }
-      else {
+      } else {
         return description
       }
     }
@@ -193,8 +182,7 @@ extension Version: ExpressibleByArgument {
   ) {
     if let version = try? Version(argument) {
       self = version
-    }
-    else {
+    } else {
       return nil
     }
   }

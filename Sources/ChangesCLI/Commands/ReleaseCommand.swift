@@ -25,11 +25,9 @@ struct ReleaseCommand: ParsableCommand {
       let readVersion = (readLine() ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
       if let version = try? Version(readVersion) {
         return version
-      }
-      else if readVersion.isEmpty {
+      } else if readVersion.isEmpty {
         print("Please enter a version number.")
-      }
-      else {
+      } else {
         print("\(readVersion) is not a valid version number.")
       }
     }

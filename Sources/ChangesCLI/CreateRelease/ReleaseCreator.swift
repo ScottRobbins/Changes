@@ -41,8 +41,7 @@ struct ReleaseCreator {
       try preReleaseFolder.createFile(named: "info.json").write(outputString)
       entriesFolder = try preReleaseFolder.createSubfolderIfNeeded(withName: "entries")
       try releaseFolder.createSubfolderIfNeeded(withName: "entries")
-    }
-    else {
+    } else {
       entriesFolder = try releaseFolder.createSubfolderIfNeeded(withName: "entries")
     }
 

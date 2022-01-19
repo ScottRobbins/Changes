@@ -55,8 +55,7 @@ struct ChangesQuerier {
         latestReleaseEntry(releaseEntries: changes.releaseEntries).map {
           changesQueryItems(from: $0, tags: tags)
         } ?? []
-    }
-    else {
+    } else {
       latestChangesQueryItems = []
     }
 
@@ -265,8 +264,7 @@ struct ChangesQuerier {
     let validTagEntries: [Entry]
     if let tags = tags {
       validTagEntries = unreleasedEntries.filter { !tags.isDisjoint(with: $0.tags) }
-    }
-    else {
+    } else {
       validTagEntries = unreleasedEntries
     }
 
@@ -294,8 +292,7 @@ struct ChangesQuerier {
     let allEntries = topLevelReleaseEntries + prereleaseEntries
     if let tags = tags {
       return allEntries.filter { !tags.isDisjoint(with: $0.tags) }
-    }
-    else {
+    } else {
       return allEntries
     }
   }
