@@ -9,7 +9,8 @@ let package = Package(
     .macOS(.v10_15)
   ],
   products: [
-    .executable(name: "changes", targets: ["ChangesCLI"])
+    .executable(name: "changes", targets: ["ChangesCLI"]),
+    .library(name: "Changes", targets: ["Changes"]),
   ],
   dependencies: [
     .package(url: "https://github.com/JohnSundell/Files", from: "4.2.0"),
@@ -18,6 +19,14 @@ let package = Package(
     .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
   ],
   targets: [
+    .target(
+      name: "Changes",
+      dependencies: [
+        "Files",
+        "Version",
+        "Yams",
+      ]
+    ),
     .target(
       name: "ChangesCLI",
       dependencies: [
@@ -30,6 +39,10 @@ let package = Package(
     .testTarget(
       name: "ChangesCLITests",
       dependencies: ["ChangesCLI"]
+    ),
+    .testTarget(
+      name: "ChangesTests",
+      dependencies: ["Changes"]
     ),
   ]
 )
