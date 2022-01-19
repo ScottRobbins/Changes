@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug changes",
+            "program": "${workspaceFolder:Changes}/.build/debug/changes",
+            "args": [],
+            "cwd": "${workspaceFolder:Changes}",
+            "preLaunchTask": "swift: Build Debug changes"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Release changes",
+            "program": "${workspaceFolder:Changes}/.build/release/changes",
+            "args": [],
+            "cwd": "${workspaceFolder:Changes}",
+            "preLaunchTask": "swift: Build Release changes"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Test Changes",
+            "program": "/Applications/Xcode_12.4.app/Contents/Developer/usr/bin/xctest",
+            "args": [
+                ".build/debug/ChangesPackageTests.xctest"
+            ],
+            "cwd": "${workspaceFolder:Changes}",
+            "preLaunchTask": "swift: Build All"
+        }
+    ]
+}
