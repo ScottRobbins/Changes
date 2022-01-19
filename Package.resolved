@@ -20,6 +20,24 @@
         }
       },
       {
+        "package": "swift-format",
+        "repositoryURL": "https://github.com/apple/swift-format.git",
+        "state": {
+          "branch": "swift-5.5-branch",
+          "revision": "f872223e16742fd97fabd319fbf4a939230cc796",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftSyntax",
+        "repositoryURL": "https://github.com/apple/swift-syntax",
+        "state": {
+          "branch": null,
+          "revision": "75e60475d9d8fd5bbc16a12e0eaa2cb01b0c322e",
+          "version": "0.50500.0"
+        }
+      },
+      {
         "package": "Version",
         "repositoryURL": "https://github.com/mrackwitz/Version.git",
         "state": {
