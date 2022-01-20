@@ -1,0 +1,8 @@
+{
+    "apple-swift-format.onlyEnableOnSwiftPMProjects": true,
+    "apple-swift-format.configSearchPaths": [
+        ".swift-format",
+        ".config/swift-format.json"
+    ],
+    "editor.formatOnSave": true
+}
