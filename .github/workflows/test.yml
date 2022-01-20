@@ -1,0 +1,17 @@
+name: Test
+
+on:
+  pull_request: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: swift:5.5.2-bionic
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: swift build
+      - name: Run tests
+        run: swift test
+      - name: Run swift-format linter
+        run: swift run swift-format lint --recursive --strict Sources Tests
