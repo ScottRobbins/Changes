@@ -78,12 +78,10 @@ jobs:
     runs-on: macos-latest
     needs: create_release
     steps:
-      - name: Install swiftenv
-        run: brew install kylef/formulae/swiftenv
+      - uses: fwal/setup-swift@4db7b0e5eb24c7550fdbabb4bb29d3f208f1292b # Commit hash
+        with:
+          swift-version: "5.2"
       - uses: actions/checkout@v2
-      - name: Install swift version
-        # If already installed, will fail
-        run: swiftenv install || true && if which swiftenv > /dev/null; then eval "$(swiftenv init -)"; fi
       - name: Build
         run: swift build -c release
       - name: Package
