@@ -101,39 +101,32 @@ struct Entries: ParsableCommand {
         includeUnreleased: includeUnreleased,
         tags: tags
       )
-    }
-    else if let start = start, let end = end {
+    } else if let start = start, let end = end {
       let startVersion = try Version(start)
       if end == "latest" {
         queriedChanges = try changesQuerier.queryUpToLatest(start: startVersion, tags: tags)
-      }
-      else {
+      } else {
         let endVersion = try Version(end)
         queriedChanges = try changesQuerier.query(versions: startVersion...endVersion, tags: tags)
       }
-    }
-    else if let start = start {
+    } else if let start = start {
       if start == "latest" {
         queriedChanges = try changesQuerier.queryIncludingUnreleasedStartingAtLatest(tags: tags)
-      }
-      else {
+      } else {
         let startVersion = try Version(start)
         queriedChanges = try changesQuerier.queryIncludingUnreleased(
           start: startVersion,
           tags: tags
         )
       }
-    }
-    else if let end = end {
+    } else if let end = end {
       if end == "latest" {
         queriedChanges = try changesQuerier.queryUpToLatest(tags: tags)
-      }
-      else {
+      } else {
         let endVersion = try Version(end)
         queriedChanges = try changesQuerier.query(versions: ...endVersion, tags: tags)
       }
-    }
-    else {
+    } else {
       queriedChanges = try changesQuerier.queryAll(tags: tags)
     }
 
