@@ -17,17 +17,6 @@
             "args": [],
             "cwd": "${workspaceFolder:Changes}",
             "preLaunchTask": "swift: Build Release changes"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Test Changes",
-            "program": "/Applications/Xcode_12.4.app/Contents/Developer/usr/bin/xctest",
-            "args": [
-                ".build/debug/ChangesPackageTests.xctest"
-            ],
-            "cwd": "${workspaceFolder:Changes}",
-            "preLaunchTask": "swift: Build All"
         }
     ]
 }

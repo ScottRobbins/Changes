@@ -28,19 +28,19 @@ jobs:
       matrix:
         image:
           # 5.5.2 Stable
-          - swift:5.5.2-bionic
-          - swift:5.5.2-focal
-          - swift:5.5.2-centos8
-          - swift:5.5.2-amazonlinux2
+          - swift:5.6.2-bionic
+          - swift:5.6.2-focal
+          - swift:5.6.2-centos8
+          - swift:5.6.2-amazonlinux2
         include:
-          - image: swift:5.5.2-bionic
-            IMAGE_IDENTIFIER: swift-5-5-2-bionic
-          - image: swift:5.5.2-focal
-            IMAGE_IDENTIFIER: swift-5-5-2-focal
-          - image: swift:5.5.2-centos8
-            IMAGE_IDENTIFIER: swift-5-5-2-centos8
-          - image: swift:5.5.2-amazonlinux2
-            IMAGE_IDENTIFIER: swift-5-5-2-amazonlinux2
+          - image: swift:5.6.2-bionic
+            IMAGE_IDENTIFIER: swift-5-6-2-bionic
+          - image: swift:5.6.2-focal
+            IMAGE_IDENTIFIER: swift-5-6-2-focal
+          - image: swift:5.6.2-centos8
+            IMAGE_IDENTIFIER: swift-5-6-2-centos8
+          - image: swift:5.6.2-amazonlinux2
+            IMAGE_IDENTIFIER: swift-5-6-2-amazonlinux2
     container: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v2
@@ -78,9 +78,9 @@ jobs:
     runs-on: macos-latest
     needs: create_release
     steps:
-      - uses: fwal/setup-swift@4db7b0e5eb24c7550fdbabb4bb29d3f208f1292b # Commit hash
+      - uses: fwal/setup-swift@2040b795e5c453c3a05fcb8316496afc8a74f192 # Commit hash
         with:
-          swift-version: "5.2"
+          swift-version: "5.6.2"
       - uses: actions/checkout@v2
       - name: Build
         run: swift build -c release
@@ -94,5 +94,5 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: changes.tar.gz
-          asset_name: changes-swift-5-5-2-macOS-dynamic.tar.gz
+          asset_name: changes-swift-5-6-2-macOS-dynamic.tar.gz
           asset_content_type: application/gzip

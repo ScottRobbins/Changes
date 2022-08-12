@@ -4,5 +4,6 @@
         ".swift-format",
         ".config/swift-format.json"
     ],
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "lldb.library": "/Applications/Xcode_13.4.1.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB"
 }
