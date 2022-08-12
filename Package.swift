@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.6
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,9 +15,9 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/JohnSundell/Files", from: "4.2.0"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.2"),
-    .package(url: "https://github.com/mrackwitz/Version.git", .exact("0.8.0")),
+    .package(url: "https://github.com/mrackwitz/Version.git", from: "0.8.0"),
     .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
-    .package(url: "https://github.com/apple/swift-format.git", .branch("swift-5.5-branch")),
+    .package(url: "https://github.com/apple/swift-format.git", branch: "release/5.6"),
   ],
   targets: [
     .target(
@@ -28,11 +28,11 @@ let package = Package(
         "Yams",
       ]
     ),
-    .target(
+    .executableTarget(
       name: "ChangesCLI",
       dependencies: [
-        "Files",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        "Files",
         "Version",
         "Yams",
       ]
