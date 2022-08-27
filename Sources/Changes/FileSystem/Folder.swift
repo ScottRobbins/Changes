@@ -5,6 +5,7 @@ protocol Folder {
   func getFiles() -> [File]
   func createSubfolderIfNeeded(withName name: String) throws -> Folder
   func file(named name: String) throws -> File
+  func getSubfolders() -> [Folder]
 }
 
 struct DefaultFolder: Folder {
@@ -22,5 +23,9 @@ struct DefaultFolder: Folder {
   func file(named name: String) throws -> File {
     let _file = try folder.file(named: name)
     return DefaultFile(file: _file)
+  }
+
+  func getSubfolders() -> [Folder] {
+    folder.subfolders.map(DefaultFolder.init)
   }
 }
