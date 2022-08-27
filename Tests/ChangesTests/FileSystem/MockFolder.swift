@@ -6,8 +6,11 @@ class MockFolder: Folder {
   var getFilesToReturn: [File]!
   var createSubfolderIfNeededToReturn: Folder!
   var createSubfolderIfNeededErrorToThrow: Error?
+  var fileNamedToReturn: File!
+  var fileNamedErrorToThrow: Error?
 
   var namePassedToCreateSubfolderIfNeeded: String?
+  var namePassedToFile: String?
 
   func getFiles() -> [File] {
     getFilesToReturn
@@ -20,6 +23,16 @@ class MockFolder: Folder {
       throw createSubfolderIfNeededErrorToThrow
     } else {
       return createSubfolderIfNeededToReturn
+    }
+  }
+
+  func file(named name: String) throws -> File {
+    namePassedToFile = name
+
+    if let fileNamedErrorToThrow = fileNamedErrorToThrow {
+      throw fileNamedErrorToThrow
+    } else {
+      return fileNamedToReturn
     }
   }
 }

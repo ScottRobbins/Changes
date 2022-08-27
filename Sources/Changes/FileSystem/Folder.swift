@@ -4,6 +4,7 @@ import Foundation
 protocol Folder {
   func getFiles() -> [File]
   func createSubfolderIfNeeded(withName name: String) throws -> Folder
+  func file(named name: String) throws -> File
 }
 
 struct DefaultFolder: Folder {
@@ -16,5 +17,10 @@ struct DefaultFolder: Folder {
   func createSubfolderIfNeeded(withName name: String) throws -> Folder {
     let subfolder = try folder.createSubfolderIfNeeded(withName: name)
     return DefaultFolder(folder: subfolder)
+  }
+
+  func file(named name: String) throws -> File {
+    let _file = try folder.file(named: name)
+    return DefaultFile(file: _file)
   }
 }
