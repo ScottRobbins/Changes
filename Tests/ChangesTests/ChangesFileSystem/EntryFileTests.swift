@@ -73,4 +73,4 @@ final class EntryFileTests: XCTestCase {
   }
 }
 
-struct TestError: Error {}
+private struct TestError: Error {}
