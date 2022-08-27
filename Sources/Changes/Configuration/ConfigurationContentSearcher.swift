@@ -2,7 +2,7 @@ import Files
 
 struct ConfigurationContentSearcher {
   func getConfigurationContents() throws -> String {
-    var _folder: Folder? = Folder.current
+    var _folder: Files.Folder? = Files.Folder.current
     while let folder = _folder {
       defer { _folder = folder.parent }
 
