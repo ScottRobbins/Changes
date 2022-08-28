@@ -6,6 +6,8 @@ protocol Folder {
   func createSubfolderIfNeeded(withName name: String) throws -> Folder
   func file(named name: String) throws -> File
   func getSubfolders() -> [Folder]
+  func getParentFolder() -> Folder?
+  func subfolder(named name: String) throws -> Folder
 }
 
 struct DefaultFolder: Folder {
@@ -27,5 +29,18 @@ struct DefaultFolder: Folder {
 
   func getSubfolders() -> [Folder] {
     folder.subfolders.map(DefaultFolder.init)
+  }
+
+  func getParentFolder() -> Folder? {
+    folder.parent.map(DefaultFolder.init)
+  }
+
+  func subfolder(named name: String) throws -> Folder {
+    let subfolder = try folder.subfolder(named: name)
+    return DefaultFolder(folder: subfolder)
+  }
+
+  static var current: Folder {
+    DefaultFolder(folder: Files.Folder.current)
   }
 }

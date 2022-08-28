@@ -9,6 +9,9 @@ class MockFolder: Folder {
   var fileNamedToReturn: File!
   var fileNamedErrorToThrow: Error?
   var getSubfoldersToReturn: [Folder]!
+  var parentFolderToReturn: Folder?
+  var subfolderNamedToReturn: Folder!
+  var subfolderNamedErrorToThrow: Error?
 
   var namePassedToCreateSubfolderIfNeeded: String?
   var namePassedToFile: String?
@@ -39,5 +42,17 @@ class MockFolder: Folder {
 
   func getSubfolders() -> [Folder] {
     return getSubfoldersToReturn
+  }
+
+  func getParentFolder() -> Folder? {
+    parentFolderToReturn
+  }
+
+  func subfolder(named name: String) throws -> Folder {
+    if let subfolderNamedErrorToThrow = subfolderNamedErrorToThrow {
+      throw subfolderNamedErrorToThrow
+    } else {
+      return subfolderNamedToReturn
+    }
   }
 }
