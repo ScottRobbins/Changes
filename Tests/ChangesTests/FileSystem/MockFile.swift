@@ -6,6 +6,7 @@ class MockFile: File {
   var nameExcludingExtensionToReturn: String!
   var readDataToReturn: Data!
   var readErrorToThrow: Error?
+  var readStringToReturn: String!
 
   var nameExcludingExtension: String {
     nameExcludingExtensionToReturn
@@ -16,6 +17,14 @@ class MockFile: File {
       throw readErrorToThrow
     } else {
       return readDataToReturn
+    }
+  }
+
+  func readAsString() throws -> String {
+    if let readErrorToThrow = readErrorToThrow {
+      throw readErrorToThrow
+    } else {
+      return readStringToReturn
     }
   }
 }
