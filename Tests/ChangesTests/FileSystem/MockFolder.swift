@@ -15,6 +15,7 @@ class MockFolder: Folder {
 
   var namePassedToCreateSubfolderIfNeeded: String?
   var namePassedToFile: String?
+  var namePassedToSubfolderNamed: String?
 
   func getFiles() -> [File] {
     getFilesToReturn
@@ -49,6 +50,8 @@ class MockFolder: Folder {
   }
 
   func subfolder(named name: String) throws -> Folder {
+    namePassedToSubfolderNamed = name
+    
     if let subfolderNamedErrorToThrow = subfolderNamedErrorToThrow {
       throw subfolderNamedErrorToThrow
     } else {
