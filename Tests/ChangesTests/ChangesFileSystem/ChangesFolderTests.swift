@@ -3,35 +3,26 @@ import XCTest
 @testable import Changes
 
 final class ChangesFolderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var changesFolder: ChangesFolder!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
     return _decoder
   }()
 
-  override func setUp() {
-    mockFolder = MockFolder()
-    changesFolder = ChangesFolder(folder: mockFolder, decoder: decoder)
-  }
-
   func testUnreleasedFolderWhenFolderCanBeCreated() throws {
     // given
-    let folderReturned = MockFolder()
-    mockFolder.createSubfolderIfNeededToReturn = folderReturned
+    let _changesFolder = MockFolder(".changes")
+    let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
-    // when
-    let _ = try changesFolder.unreleasedFolder()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToCreateSubfolderIfNeeded, "unreleased")
+    // when & then
+    XCTAssertNoThrow(try changesFolder.unreleasedFolder())
   }
 
   func testUnreleasedFolderWhenFolderCannotBeCreated() {
     // given
-    mockFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _changesFolder = MockFolder(".changes")
+    _changesFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try changesFolder.unreleasedFolder())
@@ -39,19 +30,18 @@ final class ChangesFolderTests: XCTestCase {
 
   func testReleasesFolderWhenFolderCanBeCreated() throws {
     // given
-    let folderReturned = MockFolder()
-    mockFolder.createSubfolderIfNeededToReturn = folderReturned
+    let _changesFolder = MockFolder(".changes")
+    let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
-    // when
-    let _ = try changesFolder.releasesFolder()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToCreateSubfolderIfNeeded, "releases")
+    // when & then
+    XCTAssertNoThrow(try changesFolder.releasesFolder())
   }
 
   func testReleasesFolderWhenFolderCannotBeCreated() {
     // given
-    mockFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _changesFolder = MockFolder(".changes")
+    _changesFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try changesFolder.releasesFolder())

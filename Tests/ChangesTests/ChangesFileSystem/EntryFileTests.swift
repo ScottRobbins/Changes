@@ -3,9 +3,6 @@ import XCTest
 @testable import Changes
 
 final class EntryFileTests: XCTestCase {
-  var mockFile: MockFile!
-  var entryFile: EntryFile!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
@@ -17,11 +14,6 @@ final class EntryFileTests: XCTestCase {
     _encoder.dateEncodingStrategy = .iso8601
     return _encoder
   }()
-
-  override func setUp() {
-    mockFile = MockFile()
-    entryFile = EntryFile(file: mockFile, decoder: decoder)
-  }
 
   func testReadWhenDataIsValidShouldReturnEntry() throws {
     let id = "test"
@@ -36,8 +28,8 @@ final class EntryFileTests: XCTestCase {
       createdAtDate: createdAtDate
     )
     let data = try encoder.encode(entryFileRepresentation)
-    mockFile.readDataToReturn = data
-    mockFile.nameExcludingExtensionToReturn = id
+    let mockFile = MockFile("\(id).json", contents: data)
+    let entryFile = EntryFile(file: mockFile, decoder: decoder)
 
     // when
     let entry = try entryFile.read()
@@ -53,8 +45,9 @@ final class EntryFileTests: XCTestCase {
     let id = "test"
 
     // given
+    let mockFile = MockFile("\(id).json", contents: Data())
     mockFile.readErrorToThrow = TestError()
-    mockFile.nameExcludingExtensionToReturn = id
+    let entryFile = EntryFile(file: mockFile, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try entryFile.read())
@@ -65,8 +58,8 @@ final class EntryFileTests: XCTestCase {
 
     // given
     let invalidData = Data()
-    mockFile.readDataToReturn = invalidData
-    mockFile.nameExcludingExtensionToReturn = id
+    let mockFile = MockFile("\(id).json", contents: invalidData)
+    let entryFile = EntryFile(file: mockFile, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try entryFile.read())

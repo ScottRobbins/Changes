@@ -3,59 +3,61 @@ import Foundation
 @testable import Changes
 
 class MockFolder: Folder {
-  var getFilesToReturn: [File]!
-  var createSubfolderIfNeededToReturn: Folder!
-  var createSubfolderIfNeededErrorToThrow: Error?
-  var fileNamedToReturn: File!
-  var fileNamedErrorToThrow: Error?
-  var getSubfoldersToReturn: [Folder]!
-  var parentFolderToReturn: Folder?
-  var subfolderNamedToReturn: Folder!
-  var subfolderNamedErrorToThrow: Error?
+  private(set) var name: String
+  var parentFolder: MockFolder?
+  private(set) var files: [MockFile]
+  private(set) var subfolders: [MockFolder]
 
-  var namePassedToCreateSubfolderIfNeeded: String?
-  var namePassedToFile: String?
-  var namePassedToSubfolderNamed: String?
+  init(
+    _ name: String,
+    files: [MockFile] = [],
+    subfolders: [MockFolder] = []
+  ) {
+    self.name = name
+    self.subfolders = subfolders
+    self.files = files
+  }
+
+  var createSubfolderIfNeededErrorToThrow: Error?
 
   func getFiles() -> [File] {
-    getFilesToReturn
+    files
   }
 
   func createSubfolderIfNeeded(withName name: String) throws -> Folder {
-    namePassedToCreateSubfolderIfNeeded = name
-
     if let createSubfolderIfNeededErrorToThrow = createSubfolderIfNeededErrorToThrow {
       throw createSubfolderIfNeededErrorToThrow
     } else {
-      return createSubfolderIfNeededToReturn
+      let subfolder = MockFolder(name)
+      subfolders.append(subfolder)
+      return subfolder
     }
   }
 
   func file(named name: String) throws -> File {
-    namePassedToFile = name
-
-    if let fileNamedErrorToThrow = fileNamedErrorToThrow {
-      throw fileNamedErrorToThrow
-    } else {
-      return fileNamedToReturn
+    guard let file = (files.first { $0.name == name }) else {
+      throw FileNotFound()
     }
+
+    return file
   }
 
   func getSubfolders() -> [Folder] {
-    return getSubfoldersToReturn
+    return subfolders
   }
 
   func getParentFolder() -> Folder? {
-    parentFolderToReturn
+    parentFolder
   }
 
   func subfolder(named name: String) throws -> Folder {
-    namePassedToSubfolderNamed = name
-    
-    if let subfolderNamedErrorToThrow = subfolderNamedErrorToThrow {
-      throw subfolderNamedErrorToThrow
-    } else {
-      return subfolderNamedToReturn
+    guard let subfolder = (subfolders.first { $0.name == name }) else {
+      throw SubfolderNotFound()
     }
+
+    return subfolder
   }
 }
+
+struct FileNotFound: Error {}
+struct SubfolderNotFound: Error {}

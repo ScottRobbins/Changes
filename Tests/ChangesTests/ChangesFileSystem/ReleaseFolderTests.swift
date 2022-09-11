@@ -3,41 +3,26 @@ import XCTest
 @testable import Changes
 
 final class ReleaseFolderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var releaseFolder: ReleaseFolder!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
     return _decoder
   }()
 
-  override func setUp() {
-    mockFolder = MockFolder()
-    releaseFolder = ReleaseFolder(folder: mockFolder, decoder: decoder)
-  }
-
   func testEntriesFolderWhenFolderCanBeCreated() throws {
-    let testFileId = "testFile"
-
     // given
-    let testFile = MockFile()
-    testFile.nameExcludingExtensionToReturn = testFileId
-    let folderReturned = MockFolder()
-    folderReturned.getFilesToReturn = [testFile]
-    mockFolder.createSubfolderIfNeededToReturn = folderReturned
+    let _releaseFolder = MockFolder("1.0.0")
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
-    // when
-    let entriesFolder = try releaseFolder.entriesFolder()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToCreateSubfolderIfNeeded, "entries")
-    XCTAssertEqual(entriesFolder.entryFiles().first?.id, testFileId)
+    // when & then
+    XCTAssertNoThrow(try releaseFolder.entriesFolder())
   }
 
   func testEntriesFolderWhenFolderCannotBeCreated() {
     // given
-    mockFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _releaseFolder = MockFolder("1.0.0")
+    _releaseFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try releaseFolder.entriesFolder())
@@ -45,19 +30,18 @@ final class ReleaseFolderTests: XCTestCase {
 
   func testInfoFileWhenFileCanBeFound() throws {
     // given
-    let testFile = MockFile()
-    mockFolder.fileNamedToReturn = testFile
+    let infoFile = MockFile("info.json", contents: Data())
+    let _releaseFolder = MockFolder("1.0.0", files: [infoFile])
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
-    // when
-    let _ = try releaseFolder.infoFile()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToFile, "info.json")
+    // when & then
+    XCTAssertNoThrow(try releaseFolder.infoFile())
   }
 
   func testInfoFileWhenFileCannotBeFound() {
     // given
-    mockFolder.fileNamedErrorToThrow = TestError()
+    let _releaseFolder = MockFolder("1.0.0")
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try releaseFolder.infoFile())
@@ -65,19 +49,18 @@ final class ReleaseFolderTests: XCTestCase {
 
   func testPrereleasesFolderWhenFolderCanBeCreated() throws {
     // given
-    let folderReturned = MockFolder()
-    mockFolder.createSubfolderIfNeededToReturn = folderReturned
+    let _releaseFolder = MockFolder("1.0.0")
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
-    // when
-    let _ = try releaseFolder.prereleasesFolder()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToCreateSubfolderIfNeeded, "prereleases")
+    // when & then
+    XCTAssertNoThrow(try releaseFolder.prereleasesFolder())
   }
 
   func testPrereleasesFolderWhenFolderCannotBeCreated() {
     // given
-    mockFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _releaseFolder = MockFolder("1.0.0")
+    _releaseFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try releaseFolder.prereleasesFolder())

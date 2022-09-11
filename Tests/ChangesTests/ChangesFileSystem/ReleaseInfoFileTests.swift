@@ -4,9 +4,6 @@ import XCTest
 @testable import Changes
 
 final class ReleaseInfoFileTests: XCTestCase {
-  var mockFile: MockFile!
-  var releaseInfoFile: ReleaseInfoFile!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
@@ -19,11 +16,6 @@ final class ReleaseInfoFileTests: XCTestCase {
     return _encoder
   }()
 
-  override func setUp() {
-    mockFile = MockFile()
-    releaseInfoFile = ReleaseInfoFile(file: mockFile, decoder: decoder)
-  }
-
   func testReadWhenDataIsValidShouldReturnReleaseInfo() throws {
     let version = Version(major: 1, minor: 0, patch: 0, prerelease: "alpha.1")
     let createdAtDate = ISO8601DateFormatter().date(from: "2022-08-27T00:00:00+0000")!
@@ -34,7 +26,8 @@ final class ReleaseInfoFileTests: XCTestCase {
       createdAtDate: createdAtDate
     )
     let data = try encoder.encode(entryFileRepresentation)
-    mockFile.readDataToReturn = data
+    let mockFile = MockFile("info.json", contents: data)
+    let releaseInfoFile = ReleaseInfoFile(file: mockFile, decoder: decoder)
 
     // when
     let entry = try releaseInfoFile.read()
@@ -46,7 +39,9 @@ final class ReleaseInfoFileTests: XCTestCase {
 
   func testReadWhenCannotReadFileShouldThrowError() {
     // given
+    let mockFile = MockFile("info.json", contents: Data())
     mockFile.readErrorToThrow = TestError()
+    let releaseInfoFile = ReleaseInfoFile(file: mockFile, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try releaseInfoFile.read())
@@ -55,7 +50,8 @@ final class ReleaseInfoFileTests: XCTestCase {
   func testReadWhenDataIsInvalidShouldThrowError() {
     // given
     let invalidData = Data()
-    mockFile.readDataToReturn = invalidData
+    let mockFile = MockFile("info.json", contents: invalidData)
+    let releaseInfoFile = ReleaseInfoFile(file: mockFile, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try releaseInfoFile.read())

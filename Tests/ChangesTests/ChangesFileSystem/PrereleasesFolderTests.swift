@@ -3,26 +3,21 @@ import XCTest
 @testable import Changes
 
 final class PrereleasesFolderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var prereleasesFolder: PrereleasesFolder!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
     return _decoder
   }()
 
-  override func setUp() {
-    mockFolder = MockFolder()
-    prereleasesFolder = PrereleasesFolder(folder: mockFolder, decoder: decoder)
-  }
-
   func testPrereleaseFolders() {
     // given
-    let testFolder1 = MockFolder()
-    let testFolder2 = MockFolder()
-
-    mockFolder.getSubfoldersToReturn = [testFolder1, testFolder2]
+    let testFolder1 = MockFolder("alpha.1")
+    let testFolder2 = MockFolder("alpha.2")
+    let _prereleasesFolder = MockFolder(
+      "prereleases",
+      subfolders: [testFolder1, testFolder2]
+    )
+    let prereleasesFolder = PrereleasesFolder(folder: _prereleasesFolder, decoder: decoder)
 
     // when
     let prereleaseFolders = prereleasesFolder.prereleaseFolders()

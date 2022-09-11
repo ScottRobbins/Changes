@@ -3,18 +3,11 @@ import XCTest
 @testable import Changes
 
 final class ChangesFolderFinderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var changesFolderFinder: ChangesFolderFinder!
-
-  override func setUp() {
-    mockFolder = MockFolder()
-    let workingFolderFinder = WorkingFolderFinder(currentFolder: mockFolder)
-    changesFolderFinder = ChangesFolderFinder(workingFolderFinder: workingFolderFinder)
-  }
-
   func testGetChangesWhenNoWorkingFolder() {
     // given
-    mockFolder.subfolderNamedErrorToThrow = TestError()
+    let currentFolder = MockFolder("Changes")
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let changesFolderFinder = ChangesFolderFinder(workingFolderFinder: workingFolderFinder)
 
     // when & then
     XCTAssertThrowsError(try changesFolderFinder.getChangesFolder())
@@ -22,12 +15,13 @@ final class ChangesFolderFinderTests: XCTestCase {
 
   func testGetChangesWhenChangesFolderCanBeFound() {
     // given
-    let changesFolder = MockFolder()
-    mockFolder.subfolderNamedToReturn = changesFolder
+    let changesFolder = MockFolder(".changes")
+    let currentFolder = MockFolder("Changes", subfolders: [changesFolder])
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let changesFolderFinder = ChangesFolderFinder(workingFolderFinder: workingFolderFinder)
 
     // when
     XCTAssertNoThrow(try changesFolderFinder.getChangesFolder())
-    XCTAssertEqual(mockFolder.namePassedToSubfolderNamed, ".changes")
   }
 }
 

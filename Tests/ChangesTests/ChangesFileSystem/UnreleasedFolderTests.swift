@@ -3,41 +3,26 @@ import XCTest
 @testable import Changes
 
 final class UnreleasedFolderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var unreleasedFolder: UnreleasedFolder!
-
   lazy var decoder: JSONDecoder = {
     let _decoder = JSONDecoder()
     _decoder.dateDecodingStrategy = .iso8601
     return _decoder
   }()
 
-  override func setUp() {
-    mockFolder = MockFolder()
-    unreleasedFolder = UnreleasedFolder(folder: mockFolder, decoder: decoder)
-  }
-
   func testEntriesFolderWhenFolderCanBeCreated() throws {
-    let testFileId = "testFile"
-
     // given
-    let testFile = MockFile()
-    testFile.nameExcludingExtensionToReturn = testFileId
-    let folderReturned = MockFolder()
-    folderReturned.getFilesToReturn = [testFile]
-    mockFolder.createSubfolderIfNeededToReturn = folderReturned
+    let _unreleasedFolder = MockFolder("unreleased")
+    let unreleasedFolder = UnreleasedFolder(folder: _unreleasedFolder, decoder: decoder)
 
-    // when
-    let entriesFolder = try unreleasedFolder.entriesFolder()
-
-    // then
-    XCTAssertEqual(mockFolder.namePassedToCreateSubfolderIfNeeded, "entries")
-    XCTAssertEqual(entriesFolder.entryFiles().first?.id, testFileId)
+    // when & then
+    XCTAssertNoThrow(try unreleasedFolder.entriesFolder())
   }
 
   func testEntriesFolderWhenFolderCannotBeCreated() {
     // given
-    mockFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _unreleasedFolder = MockFolder("unreleased")
+    _unreleasedFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let unreleasedFolder = UnreleasedFolder(folder: _unreleasedFolder, decoder: decoder)
 
     // when & then
     XCTAssertThrowsError(try unreleasedFolder.entriesFolder())

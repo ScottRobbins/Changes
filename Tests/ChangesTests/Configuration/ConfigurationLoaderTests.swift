@@ -4,26 +4,23 @@ import Yams
 @testable import Changes
 
 final class ConfigurationLoaderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var configurationLoader: ConfigurationLoader!
-
-  override func setUp() {
-    mockFolder = MockFolder()
-    let workingFolderFinder = WorkingFolderFinder(currentFolder: mockFolder)
-    configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
-  }
-
   func testLoadWhenValidConfigurationFile() throws {
     let tag = "test"
 
     // given
-    let changesFolder = MockFolder()
-    let configurationFile = MockFile()
+    let changesFolder = MockFolder(".changes")
     let changesConfigToReturn = ChangesConfig(tags: [tag], files: [])
-    let changesContents = try YAMLEncoder().encode(changesConfigToReturn)
-    configurationFile.readStringToReturn = changesContents
-    mockFolder.fileNamedToReturn = configurationFile
-    mockFolder.subfolderNamedToReturn = changesFolder
+    let changesContentsString = try YAMLEncoder().encode(changesConfigToReturn)
+    let changesContentsData = changesContentsString.data(using: .utf8)!
+    let configurationFile = MockFile(".changes.yml", contents: changesContentsData)
+    let currentFolder = MockFolder(
+      "Changes",
+      files: [configurationFile],
+      subfolders: [changesFolder]
+    )
+    changesFolder.parentFolder = currentFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
 
     // when
     let changesConfig = try configurationLoader.load()
@@ -34,7 +31,9 @@ final class ConfigurationLoaderTests: XCTestCase {
 
   func testLoadWhenNoWorkingFolder() {
     // given
-    mockFolder.subfolderNamedErrorToThrow = TestError()
+    let currentFolder = MockFolder("Changes")
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
 
     // when & then
     XCTAssertThrowsError(try configurationLoader.load())
@@ -42,21 +41,33 @@ final class ConfigurationLoaderTests: XCTestCase {
 
   func testLoadWhenNoConfigurationFile() {
     // given
-    let changesFolder = MockFolder()
-    mockFolder.fileNamedErrorToThrow = TestError()
-    mockFolder.subfolderNamedToReturn = changesFolder
+    let changesFolder = MockFolder(".changes")
+    let currentFolder = MockFolder("Changes", subfolders: [changesFolder])
+    changesFolder.parentFolder = currentFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
 
     // when & then
     XCTAssertThrowsError(try configurationLoader.load())
   }
 
-  func testLoadWhenConfigurationFileCannotBeRead() {
+  func testLoadWhenConfigurationFileCannotBeRead() throws {
     // given
-    let changesFolder = MockFolder()
-    let configurationFile = MockFile()
+    let tag = "test"
+    let changesFolder = MockFolder(".changes")
+    let changesConfigToReturn = ChangesConfig(tags: [tag], files: [])
+    let changesContentsString = try YAMLEncoder().encode(changesConfigToReturn)
+    let changesContentsData = changesContentsString.data(using: .utf8)!
+    let configurationFile = MockFile(".changes.yml", contents: changesContentsData)
     configurationFile.readErrorToThrow = TestError()
-    mockFolder.fileNamedToReturn = configurationFile
-    mockFolder.subfolderNamedToReturn = changesFolder
+    let currentFolder = MockFolder(
+      "Changes",
+      files: [configurationFile],
+      subfolders: [changesFolder]
+    )
+    changesFolder.parentFolder = currentFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
 
     // when & then
     XCTAssertThrowsError(try configurationLoader.load())
@@ -64,11 +75,17 @@ final class ConfigurationLoaderTests: XCTestCase {
 
   func testLoadWhenInvalidConfigurationFile() {
     // given
-    let changesFolder = MockFolder()
-    let configurationFile = MockFile()
-    configurationFile.readStringToReturn = ""
-    mockFolder.fileNamedToReturn = configurationFile
-    mockFolder.subfolderNamedToReturn = changesFolder
+    let changesFolder = MockFolder(".changes")
+    let changesContentsData = Data()
+    let configurationFile = MockFile(".changes.yml", contents: changesContentsData)
+    let currentFolder = MockFolder(
+      "Changes",
+      files: [configurationFile],
+      subfolders: [changesFolder]
+    )
+    changesFolder.parentFolder = currentFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
+    let configurationLoader = ConfigurationLoader(workingFolderFinder: workingFolderFinder)
 
     // when & then
     XCTAssertThrowsError(try configurationLoader.load())

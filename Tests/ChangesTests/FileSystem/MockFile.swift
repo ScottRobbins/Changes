@@ -3,20 +3,32 @@ import Foundation
 @testable import Changes
 
 class MockFile: File {
-  var nameExcludingExtensionToReturn: String!
-  var readDataToReturn: Data!
+  let name: String
+  let contents: Data
+
+  init(_ name: String, contents: Data) {
+    self.name = name
+    self.contents = contents
+  }
+
   var readErrorToThrow: Error?
-  var readStringToReturn: String!
 
   var nameExcludingExtension: String {
-    nameExcludingExtensionToReturn
+    var components = name.components(separatedBy: ".")
+
+    guard components.count > 1 else {
+      return name
+    }
+
+    components.removeLast()
+    return components.joined(separator: ".")
   }
 
   func read() throws -> Data {
     if let readErrorToThrow = readErrorToThrow {
       throw readErrorToThrow
     } else {
-      return readDataToReturn
+      return contents
     }
   }
 
@@ -24,7 +36,7 @@ class MockFile: File {
     if let readErrorToThrow = readErrorToThrow {
       throw readErrorToThrow
     } else {
-      return readStringToReturn
+      return String(decoding: contents, as: UTF8.self)
     }
   }
 }

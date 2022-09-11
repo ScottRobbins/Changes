@@ -3,17 +3,15 @@ import XCTest
 @testable import Changes
 
 final class WorkingFolderFinderTests: XCTestCase {
-  var mockFolder: MockFolder!
-  var workingFolderFinder: WorkingFolderFinder!
-
-  override func setUp() {
-    mockFolder = MockFolder()
-    workingFolderFinder = WorkingFolderFinder(currentFolder: mockFolder)
-  }
-
   func testGetWorkingFolderWhenInWorkingFolder() {
     // given
-    mockFolder.subfolderNamedToReturn = MockFolder()
+    let changesFolder = MockFolder(".changes")
+    let currentFolder = MockFolder(
+      "Changes",
+      subfolders: [changesFolder]
+    )
+    changesFolder.parentFolder = currentFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
 
     // when & then
     XCTAssertNoThrow(try workingFolderFinder.getWorkingFolder())
@@ -21,10 +19,15 @@ final class WorkingFolderFinderTests: XCTestCase {
 
   func testGetWorkingFolderWhenWorkingFolderIsInParentDirectory() throws {
     // given
-    mockFolder.subfolderNamedErrorToThrow = TestError()
-    let parentFolder = MockFolder()
-    parentFolder.subfolderNamedToReturn = MockFolder()
-    mockFolder.parentFolderToReturn = parentFolder
+    let changesFolder = MockFolder(".changes")
+    let workingFolder = MockFolder(
+      "Changes",
+      subfolders: [changesFolder]
+    )
+    changesFolder.parentFolder = workingFolder
+    let currentFolder = MockFolder("subfolder")
+    currentFolder.parentFolder = workingFolder
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
 
     // when & then
     XCTAssertNoThrow(try workingFolderFinder.getWorkingFolder())
@@ -32,11 +35,10 @@ final class WorkingFolderFinderTests: XCTestCase {
 
   func testGetWorkingFolderWhenWorkingFolderDoesNotExist() {
     // given
-    mockFolder.subfolderNamedErrorToThrow = TestError()
+    let currentFolder = MockFolder("Changes")
+    let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
 
     // when & then
     XCTAssertThrowsError(try workingFolderFinder.getWorkingFolder())
   }
 }
-
-private struct TestError: Error {}
