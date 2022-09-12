@@ -11,9 +11,10 @@ final class ReleasesFolderTests: XCTestCase {
 
   func testReleaseFolders() {
     // given
-    let testFolder1 = MockFolder("1.0.0")
-    let testFolder2 = MockFolder("1.1.0")
-    let _releasesFolder = MockFolder("releases", subfolders: [testFolder1, testFolder2])
+    let _releasesFolder = MockFolder("releases") {
+      MockFolder("1.0.0")
+      MockFolder("1.1.0")
+    }
     let releasesFolder = ReleasesFolder(folder: _releasesFolder, decoder: decoder)
 
     // when

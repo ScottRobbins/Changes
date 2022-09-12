@@ -2,11 +2,13 @@ import Foundation
 
 @testable import Changes
 
-class MockFolder: Folder {
+class MockFolder: Folder, MockFolderItem {
   private(set) var name: String
   var parentFolder: MockFolder?
   private(set) var files: [MockFile]
   private(set) var subfolders: [MockFolder]
+
+  var createSubfolderIfNeededErrorToThrow: Error?
 
   init(
     _ name: String,
@@ -18,7 +20,22 @@ class MockFolder: Folder {
     self.files = files
   }
 
-  var createSubfolderIfNeededErrorToThrow: Error?
+  init(_ name: String, @MockFolderBuilder content makeContent: () -> MockFolderContent) {
+    self.name = name
+
+    let content = makeContent()
+    self.files = content.files
+    self.subfolders = content.subfolders
+    for subfolder in self.subfolders {
+      subfolder.parentFolder = self
+    }
+  }
+
+  func createSubfolderError(_ error: Error) -> MockFolder {
+    let newFolder = MockFolder(name, files: files, subfolders: subfolders)
+    newFolder.createSubfolderIfNeededErrorToThrow = error
+    return newFolder
+  }
 
   func getFiles() -> [File] {
     files
@@ -56,6 +73,10 @@ class MockFolder: Folder {
     }
 
     return subfolder
+  }
+
+  func mockFolderItemPossibility() -> MockFolderItemPossibility {
+    .folder(self)
   }
 }
 

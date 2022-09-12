@@ -11,12 +11,10 @@ final class PrereleasesFolderTests: XCTestCase {
 
   func testPrereleaseFolders() {
     // given
-    let testFolder1 = MockFolder("alpha.1")
-    let testFolder2 = MockFolder("alpha.2")
-    let _prereleasesFolder = MockFolder(
-      "prereleases",
-      subfolders: [testFolder1, testFolder2]
-    )
+    let _prereleasesFolder = MockFolder("prereleases") {
+      MockFolder("alpha.1")
+      MockFolder("alpha.2")
+    }
     let prereleasesFolder = PrereleasesFolder(folder: _prereleasesFolder, decoder: decoder)
 
     // when

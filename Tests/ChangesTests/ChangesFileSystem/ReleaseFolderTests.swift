@@ -20,8 +20,7 @@ final class ReleaseFolderTests: XCTestCase {
 
   func testEntriesFolderWhenFolderCannotBeCreated() {
     // given
-    let _releaseFolder = MockFolder("1.0.0")
-    _releaseFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _releaseFolder = MockFolder("1.0.0").createSubfolderError(TestError())
     let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then
@@ -30,8 +29,9 @@ final class ReleaseFolderTests: XCTestCase {
 
   func testInfoFileWhenFileCanBeFound() throws {
     // given
-    let infoFile = MockFile("info.json", contents: Data())
-    let _releaseFolder = MockFolder("1.0.0", files: [infoFile])
+    let _releaseFolder = MockFolder("1.0.0") {
+      MockFile("info.json", contents: Data())
+    }
     let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then
@@ -58,8 +58,7 @@ final class ReleaseFolderTests: XCTestCase {
 
   func testPrereleasesFolderWhenFolderCannotBeCreated() {
     // given
-    let _releaseFolder = MockFolder("1.0.0")
-    _releaseFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _releaseFolder = MockFolder("1.0.0").createSubfolderError(TestError())
     let releaseFolder = ReleaseFolder(folder: _releaseFolder, decoder: decoder)
 
     // when & then

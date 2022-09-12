@@ -14,9 +14,10 @@ final class EntriesFolderTests: XCTestCase {
     let testFile2Id = "testFile2"
 
     // given
-    let testFile1 = MockFile("\(testFile1Id).json", contents: Data())
-    let testFile2 = MockFile("\(testFile2Id).json", contents: Data())
-    let _entriesFolder = MockFolder("entries", files: [testFile1, testFile2])
+    let _entriesFolder = MockFolder("entries") {
+      MockFile("\(testFile1Id).json", contents: Data())
+      MockFile("\(testFile2Id).json", contents: Data())
+    }
     let entriesFolder = EntriesFolder(folder: _entriesFolder, decoder: decoder)
 
     // when

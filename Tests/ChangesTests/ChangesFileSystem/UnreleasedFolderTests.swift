@@ -20,8 +20,7 @@ final class UnreleasedFolderTests: XCTestCase {
 
   func testEntriesFolderWhenFolderCannotBeCreated() {
     // given
-    let _unreleasedFolder = MockFolder("unreleased")
-    _unreleasedFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _unreleasedFolder = MockFolder("unreleased").createSubfolderError(TestError())
     let unreleasedFolder = UnreleasedFolder(folder: _unreleasedFolder, decoder: decoder)
 
     // when & then

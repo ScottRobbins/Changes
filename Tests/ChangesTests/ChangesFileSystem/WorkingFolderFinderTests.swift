@@ -5,12 +5,9 @@ import XCTest
 final class WorkingFolderFinderTests: XCTestCase {
   func testGetWorkingFolderWhenInWorkingFolder() {
     // given
-    let changesFolder = MockFolder(".changes")
-    let currentFolder = MockFolder(
-      "Changes",
-      subfolders: [changesFolder]
-    )
-    changesFolder.parentFolder = currentFolder
+    let currentFolder = MockFolder("Changes") {
+      MockFolder(".changes")
+    }
     let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
 
     // when & then
@@ -19,14 +16,11 @@ final class WorkingFolderFinderTests: XCTestCase {
 
   func testGetWorkingFolderWhenWorkingFolderIsInParentDirectory() throws {
     // given
-    let changesFolder = MockFolder(".changes")
-    let workingFolder = MockFolder(
-      "Changes",
-      subfolders: [changesFolder]
-    )
-    changesFolder.parentFolder = workingFolder
     let currentFolder = MockFolder("subfolder")
-    currentFolder.parentFolder = workingFolder
+    let _ = MockFolder("Changes") {
+      currentFolder
+      MockFolder(".changes")
+    }
     let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
 
     // when & then

@@ -20,8 +20,7 @@ final class ChangesFolderTests: XCTestCase {
 
   func testUnreleasedFolderWhenFolderCannotBeCreated() {
     // given
-    let _changesFolder = MockFolder(".changes")
-    _changesFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _changesFolder = MockFolder(".changes").createSubfolderError(TestError())
     let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
     // when & then
@@ -39,8 +38,7 @@ final class ChangesFolderTests: XCTestCase {
 
   func testReleasesFolderWhenFolderCannotBeCreated() {
     // given
-    let _changesFolder = MockFolder(".changes")
-    _changesFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _changesFolder = MockFolder(".changes").createSubfolderError(TestError())
     let changesFolder = ChangesFolder(folder: _changesFolder, decoder: decoder)
 
     // when & then

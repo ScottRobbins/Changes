@@ -15,8 +15,9 @@ final class ChangesFolderFinderTests: XCTestCase {
 
   func testGetChangesWhenChangesFolderCanBeFound() {
     // given
-    let changesFolder = MockFolder(".changes")
-    let currentFolder = MockFolder("Changes", subfolders: [changesFolder])
+    let currentFolder = MockFolder("Changes") {
+      MockFolder(".changes")
+    }
     let workingFolderFinder = WorkingFolderFinder(currentFolder: currentFolder)
     let changesFolderFinder = ChangesFolderFinder(workingFolderFinder: workingFolderFinder)
 

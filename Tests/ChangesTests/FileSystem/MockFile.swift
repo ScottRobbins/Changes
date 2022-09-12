@@ -2,16 +2,22 @@ import Foundation
 
 @testable import Changes
 
-class MockFile: File {
+class MockFile: File, MockFolderItem {
   let name: String
   let contents: Data
+
+  var readErrorToThrow: Error?
 
   init(_ name: String, contents: Data) {
     self.name = name
     self.contents = contents
   }
 
-  var readErrorToThrow: Error?
+  func readError(_ error: Error) -> MockFile {
+    let newFile = MockFile(name, contents: contents)
+    newFile.readErrorToThrow = error
+    return newFile
+  }
 
   var nameExcludingExtension: String {
     var components = name.components(separatedBy: ".")
@@ -38,5 +44,9 @@ class MockFile: File {
     } else {
       return String(decoding: contents, as: UTF8.self)
     }
+  }
+
+  func mockFolderItemPossibility() -> MockFolderItemPossibility {
+    .file(self)
   }
 }

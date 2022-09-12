@@ -20,8 +20,7 @@ final class PrereleaseFolderTests: XCTestCase {
 
   func testEntriesFolderWhenFolderCannotBeCreated() {
     // given
-    let _prereleaseFolder = MockFolder("alpha.1")
-    _prereleaseFolder.createSubfolderIfNeededErrorToThrow = TestError()
+    let _prereleaseFolder = MockFolder("alpha.1").createSubfolderError(TestError())
     let prereleaseFolder = PrereleaseFolder(folder: _prereleaseFolder, decoder: decoder)
 
     // when & then
@@ -30,8 +29,9 @@ final class PrereleaseFolderTests: XCTestCase {
 
   func testInfoFileWhenFileCanBeFound() throws {
     // given
-    let infoFile = MockFile("info.json", contents: Data())
-    let _prereleaseFolder = MockFolder("alpha.1", files: [infoFile])
+    let _prereleaseFolder = MockFolder("alpha.1") {
+      MockFile("info.json", contents: Data())
+    }
     let prereleaseFolder = PrereleaseFolder(folder: _prereleaseFolder, decoder: decoder)
 
     // when & then
